@@ -2,6 +2,7 @@ package cn.ucai.fulicenter.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.RadioButton;
 
@@ -48,19 +49,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     private void mutual(RadioButton rabtn){
         if(rabtn!=mRabtn_Boutique){
             mRabtn_Boutique.setChecked(false);
         }
         if(rabtn!=mRabtn_Cars){
             mRabtn_Cars.setChecked(false);
+
         }
         if(rabtn!=mRabtn_Category){
             mRabtn_Category.setChecked(false);
+
         }
         if(rabtn!=mRabtn_NewGoods){
             mRabtn_NewGoods.setChecked(false);
+
         }
         if(rabtn!=mRabtn_Personal_Center){
             mRabtn_Personal_Center.setChecked(false);
