@@ -5,8 +5,8 @@ import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import cn.ucai.fulicenter.MainActivity;
 import cn.ucai.fulicenter.R;
+import cn.ucai.fulicenter.utils.MFGT;
 
 public class SplashAvitivty extends AppCompatActivity {
 
@@ -32,9 +32,15 @@ public class SplashAvitivty extends AppCompatActivity {
                 if(SPLASH_TIME>(endTime-startTime)){
                     SystemClock.sleep(SPLASH_TIME-(endTime-startTime));
                 }
-                startActivity(intent);
+                MFGT.gotoMainActivity(SplashAvitivty.this);
+                MFGT.finish(SplashAvitivty.this);
             }
         }.start();
+    }
 
+    @Override
+    protected void onPause() {
+        finish();
+        super.onPause();
     }
 }
