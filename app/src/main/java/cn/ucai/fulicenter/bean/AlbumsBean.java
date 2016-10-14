@@ -47,8 +47,6 @@ public class AlbumsBean {
                 '}';
     }
 
-    //这里实验revert
-
     public void setThumbUrl(String thumbUrl) {
         this.thumbUrl = thumbUrl;
     }
