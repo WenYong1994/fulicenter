@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
+    android:background="@color/list_background"
     android:layout_height="match_parent">
     <RadioGroup
+        android:id="@+id/rg_id_bottom"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         >
         <RadioButton
+            style="@style/menu_item_style"
             android:id="@+id/rb_id_newgoods"
             android:checked="true"
             android:layout_weight="1"
@@ -21,6 +25,7 @@
             android:textColor="@color/main_botton_text_color"
             />
         <RadioButton
+            style="@style/menu_item_style"
             android:checked="false"
             android:id="@+id/rb_id_boutique"
             android:gravity="center_horizontal"
@@ -33,6 +38,7 @@
             android:textColor="@color/main_botton_text_color"
             />
         <RadioButton
+            style="@style/menu_item_style"
             android:checked="false"
             android:id="@+id/rb_id_category"
             android:gravity="center_horizontal"
@@ -49,6 +55,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
             <RadioButton
+                style="@style/menu_item_style_cart"
                 android:id="@+id/rb_id_cars"
                 android:layout_centerInParent="true"
                 android:layout_weight="1"
@@ -70,6 +77,7 @@
                 />
         </RelativeLayout>
         <RadioButton
+            style="@style/menu_item_style"
             android:checked="false"
             android:id="@+id/rb_id_persional_center"
             android:gravity="center_horizontal"
@@ -82,5 +90,10 @@
             android:textColor="@color/main_botton_text_color"
             />
     </RadioGroup>
-
+    <TextView
+        android:layout_marginBottom="2dp"
+        android:layout_above="@id/rg_id_bottom"
+        android:background="#4b4b49"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
 </RelativeLayout>
