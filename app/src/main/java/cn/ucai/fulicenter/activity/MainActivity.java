@@ -15,8 +15,4 @@ public class MainActivity extends AppCompatActivity {
         L.i("MainActivity onCreate");
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
 }
