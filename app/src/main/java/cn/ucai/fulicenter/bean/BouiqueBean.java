@@ -13,7 +13,6 @@ public class BouiqueBean {
      * imageurl : cat_image/boutique1.png
      */
 
-    //这里实验resvert
     private int id;
     private String title;
     private String description;
