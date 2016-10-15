@@ -1,5 +1,6 @@
 package cn.ucai.fulicenter.activity;
 
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,11 +8,13 @@ import android.view.View;
 import android.widget.RadioButton;
 
 import cn.ucai.fulicenter.R;
+import cn.ucai.fulicenter.fragment.NewGoodsFragment;
 import cn.ucai.fulicenter.utils.L;
 
 public class MainActivity extends AppCompatActivity {
     RadioButton mRabtn_NewGoods,mRabtn_Boutique,
             mRabtn_Category,mRabtn_Cars,mRabtn_Personal_Center;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,10 @@ public class MainActivity extends AppCompatActivity {
         switch (v.getId()){
             case R.id.rb_id_newgoods:
                 mutual((RadioButton) v);
+                NewGoodsFragment newGoodsFragment = new NewGoodsFragment();
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.add(R.id.newgoods_fragment_one,newGoodsFragment);
+                ft.commit();
                 break;
             case R.id.rb_id_boutique:
                 mutual((RadioButton) v);
@@ -63,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         }
         if(rabtn!=mRabtn_NewGoods){
             mRabtn_NewGoods.setChecked(false);
-
         }
         if(rabtn!=mRabtn_Personal_Center){
             mRabtn_Personal_Center.setChecked(false);

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:background="@color/list_background"
     android:layout_height="match_parent">
@@ -96,4 +95,12 @@
         android:background="#4b4b49"
         android:layout_width="match_parent"
         android:layout_height="1dp" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/newgoods_fragment_one"
+        android:layout_above="@id/rg_id_bottom"
+        android:layout_marginBottom="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </LinearLayout>
 </RelativeLayout>

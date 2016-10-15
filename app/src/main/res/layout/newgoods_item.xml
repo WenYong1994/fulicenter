@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:src="@mipmap/goods_thumb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/iv_newgoods"
+        />
+    <TextView
+        android:layout_marginLeft="23dp"
+        android:layout_marginTop="-50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="双层分格饭"
+        android:id="@+id/newgoods_name"
+        />
+    <TextView
+        android:layout_marginLeft="23dp"
+        android:id="@+id/newgoods_price"
+        android:layout_marginTop="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="¥293"
+        android:textColor="@color/red"
+        />
+</LinearLayout>

@@ -5,4 +5,7 @@
     <string name="now_refresh">now_refresh</string>
     <string name="no_more">no more</string>
     <string name="load_more">load more</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
