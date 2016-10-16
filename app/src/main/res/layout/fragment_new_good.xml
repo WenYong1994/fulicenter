@@ -2,29 +2,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.NewGoodsFragment">
-
-    <!-- TODO: Update blank fragment layout -->
-    <LinearLayout
-        android:orientation="vertical"
+    tools:context=".fragment.NewGoodsFragment"
+    >
+    <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="加载中……"
-            android:gravity="center"
-            android:id="@+id/tv_hint"
-            android:textSize="20dp"
-            android:visibility="gone"
-            />
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerview_newgoods"
+        android:layout_height="match_parent"
+        android:id="@+id/swipe_Refresh"
+        >
+        <!-- TODO: Update blank fragment layout -->
+        <LinearLayout
+            android:background="#c1bfbf"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-        </android.support.v7.widget.RecyclerView>
+            <TextView
+                android:background="#c1bfbf"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="加载中……"
+                android:gravity="center"
+                android:id="@+id/tv_hint"
+                android:textSize="20dp"
+                android:visibility="gone"
+                />
+            <android.support.v7.widget.RecyclerView
+                android:background="#c1bfbf"
+                android:layout_marginLeft="10dp"
+                android:layout_gravity="center_horizontal"
+                android:id="@+id/recyclerview_newgoods"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </android.support.v7.widget.RecyclerView>
 
-    </LinearLayout>
+        </LinearLayout>
 
-
+    </android.support.v4.widget.SwipeRefreshLayout>
 </FrameLayout>

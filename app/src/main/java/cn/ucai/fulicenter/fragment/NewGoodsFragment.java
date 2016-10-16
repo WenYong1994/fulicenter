@@ -2,8 +2,11 @@ package cn.ucai.fulicenter.fragment;
 
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -23,6 +26,7 @@ import cn.ucai.fulicenter.R;
 import cn.ucai.fulicenter.bean.NewGoodsBean;
 import cn.ucai.fulicenter.bean.Result;
 import cn.ucai.fulicenter.utils.I;
+import cn.ucai.fulicenter.utils.ImageLoader;
 import cn.ucai.fulicenter.utils.L;
 import cn.ucai.fulicenter.utils.OkHttpUtils;
 
@@ -36,19 +40,25 @@ public class NewGoodsFragment extends Fragment {
     TextView tvHint;
     @Bind(R.id.recyclerview_newgoods)
     RecyclerView recyclerviewNewgoods;
-    StaggeredGridLayoutManager mStaggeredGridLayoutManager;
+    @Bind(R.id.swipe_Refresh)
+    SwipeRefreshLayout swipeRefresh;
 
+
+    GridLayoutManager mGridaLayoutManager;
+    StaggeredGridLayoutManager mStaggeredGridLayoutManager;
 
     NewGoodsAdpter mNewGoodsAdapter;
     ArrayList<NewGoodsBean> list;
 
 
-    final int PAGE_SIZE=10;
+    final int PAGE_SIZE=6;
     int page_id =1;
 
     final int PULL_UP_ACTION=0;
     final int PULL_DOWN_ACTION=1;
     final int BENGIE_ACTION=2;
+
+    int mNewState;
 
 
     public NewGoodsFragment() {
@@ -63,19 +73,50 @@ public class NewGoodsFragment extends Fragment {
         ButterKnife.bind(this, view);
         initView();
         initDate();
+        setListener();
         return view;
+
+    }
+
+    //设置监听事件
+    private void setListener() {
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefresh.setEnabled(true);
+                swipeRefresh.setRefreshing(true);
+                tvHint.setVisibility(View.VISIBLE);
+                page_id=1;
+                downData(page_id,PULL_DOWN_ACTION);
+            }
+        });
+        recyclerviewNewgoods.setOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                mNewState=newState;
+                int lastPosition = mGridaLayoutManager.findLastVisibleItemPosition();
+
+                if(lastPosition>=mNewGoodsAdapter.getItemCount()-1&&newState==RecyclerView.SCROLL_STATE_IDLE
+                        &&mNewGoodsAdapter.isMore()){
+                    page_id++;
+                    downData(page_id,PULL_UP_ACTION);
+                }
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
     }
 
     private void initView() {
         list=new ArrayList<>();
+        mGridaLayoutManager = new GridLayoutManager(getContext(),2,GridLayoutManager.VERTICAL,false);
         mStaggeredGridLayoutManager = new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);
         mNewGoodsAdapter=new NewGoodsAdpter(list,getContext());
-        recyclerviewNewgoods.setLayoutManager(mStaggeredGridLayoutManager);
+        recyclerviewNewgoods.setLayoutManager(mGridaLayoutManager);
         recyclerviewNewgoods.setAdapter(mNewGoodsAdapter);
-        downData(1,BENGIE_ACTION);
     }
 
-    private void downData(int page_id,int ACTION) {
+    private void downData(int page_id, final int action) {
         final OkHttpUtils<NewGoodsBean[]> utils = new OkHttpUtils<>(getContext());
         utils.setRequestUrl(I.REQUEST_FIND_NEW_BOUTIQUE_GOODS)
                 .addParam(I.GoodsDetails.KEY_CAT_ID,0+"")
@@ -85,19 +126,34 @@ public class NewGoodsFragment extends Fragment {
                 .execute(new OkHttpUtils.OnCompleteListener<NewGoodsBean[]>() {
                     @Override
                     public void onSuccess(NewGoodsBean[] result) {
-                        if (result!=null){
+
+                        if (result!=null&&result.length!=0){
                             list = utils.array2List(result);
-                            Iterator<NewGoodsBean> iterator = list.iterator();
-                            while(iterator.hasNext()){
-                                L.i(iterator.next().toString());
+                            switch (action){
+                                case BENGIE_ACTION:
+                                    mNewGoodsAdapter.initOrRefreshList(list);
+                                    break;
+                                case PULL_DOWN_ACTION:
+                                    swipeRefresh.setRefreshing(false);
+                                    tvHint.setVisibility(View.GONE);
+                                    mNewGoodsAdapter.setMore(true);
+                                    mNewGoodsAdapter.initOrRefreshList(list);
+                                    ImageLoader.release();
+                                    break;
+                                case PULL_UP_ACTION:
+                                    mNewGoodsAdapter.addList(list);
+                                    break;
                             }
-                            mNewGoodsAdapter.initOrRefreshList(list);
+
+                        }else {
+                            mNewGoodsAdapter.setMore(false);
+                            mNewGoodsAdapter.notifyDataSetChanged();
                         }
                     }
 
                     @Override
                     public void onError(String error) {
-
+                        L.e("下载失败了");
                     }
                 });
 
@@ -105,7 +161,7 @@ public class NewGoodsFragment extends Fragment {
 
     //初始化数据
     private void initDate() {
-
+        downData(1,BENGIE_ACTION);
     }
 
     @Override
@@ -195,6 +251,7 @@ public class NewGoodsFragment extends Fragment {
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
             //这里进行判断，如果是最后一个就代表是底部提醒信息
             if(position==newGoodsBeenList.size()){
+                mGridaLayoutManager.setSpanCount(2);
                 FooterViewHolder footerViewHolder = (FooterViewHolder) holder;
                 //通过isMore变量来判断是否有更多数据加载
                 if(isMore){
@@ -208,24 +265,30 @@ public class NewGoodsFragment extends Fragment {
             NewGoodsViewHolder newGoodsViewHolder = (NewGoodsViewHolder) holder;
             newGoodsViewHolder.newgoodsName.setText(newGoodsBean.getGoodsName());
             newGoodsViewHolder.newgoodsPrice.setText(newGoodsBean.getShopPrice());
-            newGoodsViewHolder.ivNewgoods.setImageResource(R.mipmap.goods_thumb);
+            //下载图片
+            ImageLoader.build(I.SERVER_ROOT+I.REQUEST_DOWNLOAD_IMAGE)
+                    .addParam(I.Boutique.IMAGE_URL,newGoodsBean.getGoodsThumb())
+                    .defaultPicture(R.mipmap.goods_thumb)
+                    .imageView(newGoodsViewHolder.ivNewgoods)
+                    .width(160)
+                    .height(240)
+                    .setDragging(mNewState==RecyclerView.SCROLL_STATE_IDLE)
+                    .listener(parent)
+                    .showImage(context);
         }
-
-
-
-
-
 
         @Override
         public int getItemCount() {
             //如果这个list是null就返回0
             return newGoodsBeenList==null?0:newGoodsBeenList.size()+1;
+
         }
 
         //定义刷新加载时list数据改变的方法
         public  void initOrRefreshList(ArrayList<NewGoodsBean> list){
-            list.clear();
-            this.newGoodsBeenList=list;
+            newGoodsBeenList.clear();
+            this.newGoodsBeenList.addAll(list);
+            L.i(newGoodsBeenList.toString());
             notifyDataSetChanged();
         }
 
@@ -244,6 +307,5 @@ public class NewGoodsFragment extends Fragment {
             return NEW_GOODS_TYPE;
         }
     }
-
 
 }

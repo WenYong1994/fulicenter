@@ -310,7 +310,6 @@ public class OkHttpUtils<T> {
             mListener = listener;
         }
         Request.Builder builder = new Request.Builder().url(mUrl.toString());
-        L.e("url="+mUrl);
         if (mFormBodyBuilder != null) {
             RequestBody body = mFormBodyBuilder.build();
             builder.post(body);
