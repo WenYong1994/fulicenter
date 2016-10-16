@@ -74,8 +74,18 @@ public class NewGoodsFragment extends Fragment {
         initView();
         initDate();
         setListener();
+        setManagerSpan();
         return view;
 
+    }
+
+    private void setManagerSpan() {
+        mGridaLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return position==mNewGoodsAdapter.getItemCount()-1?2:1;
+            }
+        });
     }
 
     //设置监听事件
