@@ -6,17 +6,25 @@ import android.app.Application;
  * Created by Administrator on 2016/10/17.
  */
 public class FuLiCenterApplication extends Application{
-    private static  FuLiCenterApplication applicationContext;
+    private static  FuLiCenterApplication instance;
+    public static FuLiCenterApplication application;
 
-        public static FuLiCenterApplication getInstance(){
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        application=this;
+        instance=this;
+    }
 
-            if(applicationContext==null){
-                synchronized (applicationContext){
-                    if(applicationContext==null){
-                        applicationContext=new FuLiCenterApplication();
+    public static FuLiCenterApplication getInstance(){
+
+            if(instance==null){
+                synchronized (instance){
+                    if(instance==null){
+                        instance=new FuLiCenterApplication();
                     }
                 }
             }
-            return applicationContext;
+            return instance;
         }
 }

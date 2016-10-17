@@ -297,7 +297,7 @@ public class NewGoodsFragment extends Fragment {
             //下载图片
             ImageLoader.build(I.SERVER_ROOT+I.REQUEST_DOWNLOAD_IMAGE)
                     .addParam(I.Boutique.IMAGE_URL,newGoodsBean.getGoodsThumb())
-                    .defaultPicture(R.drawable.defult_thumb)
+                    .defaultPicture(R.drawable.nopic)
                     .imageView(newGoodsViewHolder.ivNewgoods)
                     .width(160)
                     .height(240)

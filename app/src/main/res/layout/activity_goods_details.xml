@@ -1,6 +1,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
 android:layout_width="match_parent"
 android:layout_height="match_parent">
     <RelativeLayout
@@ -64,12 +65,14 @@ android:layout_height="match_parent">
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/defult_thumb"
+        android:visibility="gone"
         />
     <RelativeLayout
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <LinearLayout
+            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/good_detail_information_lin"
             android:layout_width="300dp"
             android:layout_height="450dp"
@@ -122,9 +125,22 @@ android:layout_height="match_parent">
                     />
             </RelativeLayout>
             <android.support.v4.view.ViewPager
-                android:id="@+id/good_detail_view_pager"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"/>
+                android:layout_height="250dp"
+                android:id="@+id/Goods_Details_Image_ViewPager"
+                >
+            </android.support.v4.view.ViewPager>
+            <cn.ucai.fulicenter.view.Cercle
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:count="5"
+                app:focus="1"
+                app:r="5dp"
+                app:focus_color="#ff5900"
+                app:normal_color="#cfcfcf"
+                android:id="@+id/good_detail_cercle"
+                />
             <TextView
                 android:id="@+id/good_detail_text_detail"
                 android:layout_width="match_parent"

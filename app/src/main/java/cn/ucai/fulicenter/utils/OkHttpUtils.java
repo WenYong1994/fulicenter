@@ -217,7 +217,7 @@ public class OkHttpUtils<T> {
         //http://120.26.242.249:8080/SuperWeChatServerV2.0/register?m_user_name=aaaaaa&m_user_nick=aaaaaa&m_user_password=aaaaaa
         mUrl = new StringBuilder(I.SERVER_ROOT);
         mUrl.append(request);
-//        Log.e("okhttp","1 murl="+ mUrl.toString());
+        // L.e("okhttp","1 murl="+ mUrl.toString());
         return this;
     }
 
@@ -356,6 +356,7 @@ public class OkHttpUtils<T> {
                 }
             }
         });
+        L.e(mUrl.toString());
     }
 
     Callback mCallback;
