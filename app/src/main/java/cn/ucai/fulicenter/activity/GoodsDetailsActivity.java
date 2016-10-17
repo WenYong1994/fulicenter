@@ -2,6 +2,7 @@ package cn.ucai.fulicenter.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -51,6 +52,16 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
         setContentView(R.layout.activity_goods_details);
         ButterKnife.bind(this);
         initData();
+        setListener();
+    }
+
+    private void setListener() {
+        mgoodDetailTitleBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void initData() {
@@ -71,7 +82,6 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
                         }else {
                             Log.e(TAG, "onSuccess: Null" +id);
                         }
-
                     }
                     @Override
                     public void onError(String error) {
@@ -79,7 +89,6 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
                     }
                 });
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();

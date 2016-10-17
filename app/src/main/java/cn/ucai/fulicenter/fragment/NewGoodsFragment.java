@@ -126,7 +126,6 @@ public class NewGoodsFragment extends Fragment {
     private void initView() {
         list=new ArrayList<>();
         mGridaLayoutManager = new GridLayoutManager(getContext(),2,GridLayoutManager.VERTICAL,false);
-        mStaggeredGridLayoutManager = new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);
         mNewGoodsAdapter=new NewGoodsAdpter(list,getContext());
         recyclerviewNewgoods.setLayoutManager(mGridaLayoutManager);
         recyclerviewNewgoods.setAdapter(mNewGoodsAdapter);
