@@ -6,9 +6,13 @@
     android:layout_height="250dp"
     android:background="#c1bfbf">
     <LinearLayout
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical"
         android:background="#fff"
         android:layout_width="190dp"
+        android:gravity="center_horizontal"
         android:layout_height="240dp">
+
         <ImageView
             android:src="@mipmap/goods_thumb"
             android:layout_width="190dp"
