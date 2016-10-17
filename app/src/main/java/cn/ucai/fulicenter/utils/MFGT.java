@@ -21,4 +21,10 @@ public class MFGT {
         context.startActivity(intent);
         context.overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
     }
+    //重写工具类，实现可以实现传值
+    public static void startActivity(Activity context,Class<?> cls,Intent intent){
+        intent.setClass(context,cls);
+        context.startActivity(intent);
+        context.overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+    }
 }

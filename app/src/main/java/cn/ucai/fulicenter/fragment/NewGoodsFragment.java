@@ -1,7 +1,9 @@
 package cn.ucai.fulicenter.fragment;
 
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,11 +26,14 @@ import java.util.Iterator;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cn.ucai.fulicenter.R;
+import cn.ucai.fulicenter.activity.GoodsDetailsActivity;
+import cn.ucai.fulicenter.activity.MainActivity;
 import cn.ucai.fulicenter.bean.NewGoodsBean;
 import cn.ucai.fulicenter.bean.Result;
 import cn.ucai.fulicenter.utils.I;
 import cn.ucai.fulicenter.utils.ImageLoader;
 import cn.ucai.fulicenter.utils.L;
+import cn.ucai.fulicenter.utils.MFGT;
 import cn.ucai.fulicenter.utils.OkHttpUtils;
 
 /**
@@ -254,6 +260,18 @@ public class NewGoodsFragment extends Fragment {
             }
             View viewNewGoods = View.inflate(context,R.layout.newgoods_item,null);
             viewHolder = new NewGoodsViewHolder(viewNewGoods);
+            //这里给itemView设置点击事件
+            //长按进入商品详情
+            viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    int id = (int) v.getTag();
+                    Intent intent = new Intent();
+                    intent.putExtra("id",id);
+                    MFGT.startActivity((MainActivity) context, GoodsDetailsActivity.class,intent);
+                    return true;
+                }
+            });
             return viewHolder;
         }
 
@@ -275,10 +293,12 @@ public class NewGoodsFragment extends Fragment {
             NewGoodsViewHolder newGoodsViewHolder = (NewGoodsViewHolder) holder;
             newGoodsViewHolder.newgoodsName.setText(newGoodsBean.getGoodsName());
             newGoodsViewHolder.newgoodsPrice.setText(newGoodsBean.getShopPrice());
+            //把商品的id通过itemView的tag传回去
+            newGoodsViewHolder.itemView.setTag(newGoodsBean.getGoodsId());
             //下载图片
             ImageLoader.build(I.SERVER_ROOT+I.REQUEST_DOWNLOAD_IMAGE)
                     .addParam(I.Boutique.IMAGE_URL,newGoodsBean.getGoodsThumb())
-                    .defaultPicture(R.mipmap.goods_thumb)
+                    .defaultPicture(R.drawable.defult_thumb)
                     .imageView(newGoodsViewHolder.ivNewgoods)
                     .width(160)
                     .height(240)
@@ -317,5 +337,4 @@ public class NewGoodsFragment extends Fragment {
             return NEW_GOODS_TYPE;
         }
     }
-
 }
