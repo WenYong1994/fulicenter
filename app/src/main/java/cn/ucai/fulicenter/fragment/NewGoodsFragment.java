@@ -96,16 +96,11 @@ public class NewGoodsFragment extends Fragment {
 
     //设置监听事件
     private void setListener() {
-        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                swipeRefresh.setEnabled(true);
-                swipeRefresh.setRefreshing(true);
-                tvHint.setVisibility(View.VISIBLE);
-                page_id=1;
-                downData(page_id,PULL_DOWN_ACTION);
-            }
-        });
+        setRefresh();
+        setRecycler();
+    }
+
+    private void setRecycler() {
         recyclerviewNewgoods.setOnScrollListener(new RecyclerView.OnScrollListener() {
 
             @Override
@@ -119,6 +114,20 @@ public class NewGoodsFragment extends Fragment {
                     downData(page_id,PULL_UP_ACTION);
                 }
                 super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
+
+    }
+
+    private void setRefresh() {
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefresh.setEnabled(true);
+                swipeRefresh.setRefreshing(true);
+                tvHint.setVisibility(View.VISIBLE);
+                page_id=1;
+                downData(page_id,PULL_DOWN_ACTION);
             }
         });
     }
