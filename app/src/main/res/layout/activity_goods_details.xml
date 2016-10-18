@@ -75,14 +75,14 @@
         android:layout_height="15dp"
         android:background="#d6d6d6"
         />
-    <LinearLayout
-        android:orientation="vertical"
-        android:id="@+id/good_detail_uploading_lin"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/defult_thumb"
-        android:visibility="visible"
-        />
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:id="@+id/good_detail_uploading_lin"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/defult_thumb"
+                        android:visibility="visible"
+                        />
     <RelativeLayout
         android:gravity="center"
         android:layout_width="match_parent"
@@ -166,4 +166,11 @@
                 />
         </LinearLayout>
     </RelativeLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:id="@+id/good_detail_pupowindow"
+        android:layout_width="5dp"
+        android:layout_height="5dp"
+        android:layout_marginTop="-5dp"
+        />
 </LinearLayout>

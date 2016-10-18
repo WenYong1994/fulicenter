@@ -2,6 +2,7 @@ package cn.ucai.fulicenter.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +25,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.Inflater;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -91,6 +94,7 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
     }
 
     private void setOnTouch() {
+        //对触摸事件的处理。来协调手动拖动图片和自动轮播图片之间的协调
         mGoodsDetailsImageViewPager.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -107,7 +111,6 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
                             mHandler.sendMessage(msg);
                         }
                     }.start();
-
                 }
                 return false;
             }
@@ -128,6 +131,29 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
         };
     }
     private void setListener() {
+        setMGoodDetailTitleBackListener();
+        setMGoodsDetailTitleShareListener();
+    }
+
+    private void setMGoodsDetailTitleShareListener() {
+        mgoodDetailTitleShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupWindow popupWindow = new PopupWindow();
+                View view = getLayoutInflater().inflate(R.layout.popuwindown_share,null);
+                popupWindow.setContentView(view);
+                popupWindow.setTouchable(true);
+                popupWindow.setOutsideTouchable(true);
+                popupWindow.setBackgroundDrawable(new BitmapDrawable());
+                popupWindow.setWidth(LinearLayout.LayoutParams.MATCH_PARENT);
+                popupWindow.setHeight(300);
+                View view1 = findViewById(R.id.good_detail_pupowindow);
+                popupWindow.showAsDropDown(view1);
+            }
+        });
+    }
+
+    private void setMGoodDetailTitleBackListener() {
         mgoodDetailTitleBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -153,6 +179,7 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
                             List<AlbumsBean> list = result.getProperties()[0].getAlbums();
                             mAlbumsBeanList=new ArrayList<AlbumsBean>(list);
                             mgoodDetaiUploadingLin.setVisibility(View.GONE);
+                            //数据下载完成后再去调用设置Adapter
                             initAdapter();
                         }else {
                             Log.e(TAG, "onSuccess: Null" +id);
@@ -177,6 +204,7 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
         }
         GoodsDetailsAdpter adpter = new GoodsDetailsAdpter(mImagerViewList);
         mGoodsDetailsImageViewPager.setAdapter(adpter);
+        //适配器完成后再去设置圆点的个数
         setCercle();
     }
 
@@ -234,7 +262,7 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
         public void destroyItem(ViewGroup container, int position, Object object) {
             container.removeView(list.get(position));
         }
-    }
+}
 
 
 
