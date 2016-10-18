@@ -35,7 +35,7 @@
                 <android.support.v7.widget.RecyclerView
                     android:background="#c1bfbf"
                     android:layout_gravity="center_horizontal"
-                    android:id="@+id/recyclerview_newgoods"
+                    android:id="@+id/recyclerview_Boutique_First"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
                 </android.support.v7.widget.RecyclerView>

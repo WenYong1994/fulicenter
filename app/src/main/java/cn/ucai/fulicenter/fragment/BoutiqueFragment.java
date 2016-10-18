@@ -2,6 +2,7 @@ package cn.ucai.fulicenter.fragment;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -23,11 +25,15 @@ import java.util.Arrays;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cn.ucai.fulicenter.R;
+import cn.ucai.fulicenter.activity.BoutiqueSecondActivity;
+import cn.ucai.fulicenter.activity.MainActivity;
+import cn.ucai.fulicenter.application.FuLiCenterApplication;
 import cn.ucai.fulicenter.bean.BouiqueBean;
 import cn.ucai.fulicenter.bean.NewGoodsBean;
 import cn.ucai.fulicenter.utils.CommonUtils;
 import cn.ucai.fulicenter.utils.I;
 import cn.ucai.fulicenter.utils.L;
+import cn.ucai.fulicenter.utils.MFGT;
 import cn.ucai.fulicenter.utils.OkHttpUtils;
 
 /**
@@ -38,7 +44,7 @@ public class BoutiqueFragment extends Fragment {
     View view;
     @Bind(R.id.tv_hint_Boutique_First)
     TextView tvHintBoutiqueFirst;
-    @Bind(R.id.recyclerview_newgoods)
+    @Bind(R.id.recyclerview_Boutique_First)
     RecyclerView recyclerviewBoutique;
     @Bind(R.id.swipe_Refresh_Boutique_First)
     SwipeRefreshLayout swipeRefreshBoutiqueFirst;
@@ -70,8 +76,21 @@ public class BoutiqueFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_boutique, container, false);
         ButterKnife.bind(this, view);
         initViwe();
-        initData(BENGIE_ACTION);
+        downData();
+        setLisener();
         return view;
+    }
+
+    private void setLisener() {
+        swipeRefreshBoutiqueFirst.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefreshBoutiqueFirst.setEnabled(true);
+                swipeRefreshBoutiqueFirst.setRefreshing(true);
+                tvHintBoutiqueFirst.setVisibility(View.VISIBLE);
+                downData();
+            }
+        });
     }
 
     private void initViwe() {
@@ -82,7 +101,7 @@ public class BoutiqueFragment extends Fragment {
         recyclerviewBoutique.setLayoutManager(mManager);
     }
 
-    private void initData(final int action) {
+    private void downData() {
         final OkHttpUtils<BouiqueBean[]> myutils = new OkHttpUtils<BouiqueBean[]>(getContext());
         myutils.url(I.SERVER_ROOT+I.REQUEST_FIND_BOUTIQUES)
                 .targetClass(BouiqueBean[].class)
@@ -90,27 +109,14 @@ public class BoutiqueFragment extends Fragment {
                     @Override
                     public void onSuccess(BouiqueBean[] result) {
                         if(result!=null||result.length!=0){
-                            switch (action){
-                                case BENGIE_ACTION:
-                                    L.i("result"+ Arrays.toString(result));
-                                    ArrayList list1=(myutils.array2List(result));
-                                    L.i("result,list+"+list1.toString());
-                                    mAdpter.initOrRefreshList(list1);
-                                    break;
-                                case PULL_DOWN_ACTION:
-
-                                    break;
-                                case PULL_UP_ACTION:
-
-                                    break;
-                            }
+                            ArrayList list1=(myutils.array2List(result));
+                            mAdpter.initOrRefreshList(list1);
+                            swipeRefreshBoutiqueFirst.setRefreshing(false);
+                            tvHintBoutiqueFirst.setVisibility(View.GONE);
                         }else {
-
                             L.i("result"+ Arrays.toString(result));
                         }
-
                     }
-
                     @Override
                     public void onError(String error) {
                         CommonUtils.showShortToast("下载数据失败");
@@ -148,8 +154,6 @@ public class BoutiqueFragment extends Fragment {
     }
 
     class BoutiqueFragmentAdpter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
-
-
         //定义itemType的常量
         final int NEW_GOODS_TYPE=0;
         final int FOOTER_HINT_TYPE = 1;
@@ -184,7 +188,19 @@ public class BoutiqueFragment extends Fragment {
                 return holder;
             }
             View view2 = View.inflate(context,R.layout.boutique_first_item,null);
-            BoutiqueFirstViewHolder holder = new BoutiqueFirstViewHolder(view2);
+            final BoutiqueFirstViewHolder holder = new BoutiqueFirstViewHolder(view2);
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MyMsg myMsg = (MyMsg) holder.itemView.getTag();
+                    int id = myMsg.id;
+                    String name = myMsg.name;
+                    Intent intent = new Intent();
+                    intent.putExtra("cat_id",id);
+                    intent.putExtra("name",name);
+                    MFGT.startActivity((MainActivity)context, BoutiqueSecondActivity.class,intent);
+                }
+            });
             return holder;
         }
 
@@ -192,12 +208,7 @@ public class BoutiqueFragment extends Fragment {
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
             if(position==list.size()){
                 FooterViewHolder myHolder = (FooterViewHolder) holder;
-                if(isMore()){
-                    myHolder.tvFooter.setText("上拉加载更多数据");
-
-                }else{
-                    myHolder.tvFooter.setText("没有更多数据加载");
-                }
+                myHolder.tvFooter.setText("更多精选，请关注公众微信号ucaiXueYuan");
                 return;
             }
             BouiqueBean bouiquBean = list.get(position);
@@ -205,6 +216,8 @@ public class BoutiqueFragment extends Fragment {
             myHolder.boutiqueFirstTextviewOne.setText(bouiquBean.getTitle());
             myHolder.boutiqueFirstTextviewTwo.setText(bouiquBean.getName());
             myHolder.boutiqueFirstTextviewThree.setText(bouiquBean.getDescription());
+            MyMsg myMsg = new MyMsg(bouiquBean.getId(),bouiquBean.getName());
+            myHolder.itemView.setTag(myMsg);
             Picasso.with(context)
                     .load(I.DOWNLOAD_IMG_URL+bouiquBean.getImageurl())
                     .error(R.drawable.nopic)
@@ -219,9 +232,7 @@ public class BoutiqueFragment extends Fragment {
         //定义刷新加载时list数据改变的方法
         public  void initOrRefreshList(ArrayList<BouiqueBean> list1){
             this.list.clear();
-            L.i("initOrRefreshList+1"+list1.toString());
             this.list.addAll(list1);
-            L.i("initOrRefreshList+2"+this.list.toString());
             notifyDataSetChanged();
         }
 
@@ -242,11 +253,20 @@ public class BoutiqueFragment extends Fragment {
         }
     }
 
-
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
     }
+
+    class MyMsg {
+        int id;
+        String name;
+
+        public MyMsg(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+    }
+
 }

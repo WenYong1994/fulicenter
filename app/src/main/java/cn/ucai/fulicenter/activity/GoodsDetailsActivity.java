@@ -38,6 +38,7 @@ import cn.ucai.fulicenter.utils.CommonUtils;
 import cn.ucai.fulicenter.utils.I;
 import cn.ucai.fulicenter.utils.ImageLoader;
 import cn.ucai.fulicenter.utils.L;
+import cn.ucai.fulicenter.utils.MFGT;
 import cn.ucai.fulicenter.utils.OkHttpUtils;
 import cn.ucai.fulicenter.view.Cercle;
 
@@ -197,6 +198,8 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
                     .error(R.drawable.nopic)
                     .into(iv);
             mImagerViewList.add(iv);
+            L.e("详细信息uri"+I.SERVER_ROOT+I.REQUEST_DOWNLOAD_IMAGE+"?"+I.Boutique.IMAGE_URL+
+                    "="+albumsBean.getImgUrl());
         }
         GoodsDetailsAdpter adpter = new GoodsDetailsAdpter(mImagerViewList);
         mGoodsDetailsImageViewPager.setAdapter(adpter);
@@ -205,7 +208,6 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
     }
 
     private void setCercle() {
-        L.e("mCount:"+mCount);
         mGoodDetailCercle.setCount(mImagerViewList.size());
         mCount=mAlbumsBeanList.size();
         if(!isRun){
@@ -293,6 +295,11 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
         oks.show(this);
     }
 
+    @Override
+    public void onBackPressed() {
+        MFGT.finish(this);
+        super.onBackPressed();
+    }
 
     @Override
     protected void onDestroy() {

@@ -1,58 +1,49 @@
-package cn.ucai.fulicenter.fragment;
+package cn.ucai.fulicenter.activity;
 
-
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cn.ucai.fulicenter.R;
-import cn.ucai.fulicenter.activity.GoodsDetailsActivity;
-import cn.ucai.fulicenter.activity.MainActivity;
 import cn.ucai.fulicenter.bean.NewGoodsBean;
-import cn.ucai.fulicenter.bean.Result;
 import cn.ucai.fulicenter.utils.I;
 import cn.ucai.fulicenter.utils.ImageLoader;
 import cn.ucai.fulicenter.utils.L;
 import cn.ucai.fulicenter.utils.MFGT;
 import cn.ucai.fulicenter.utils.OkHttpUtils;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class NewGoodsFragment extends Fragment {
-    public static final String TAG = NewGoodsFragment.class.getSimpleName();
-    View view;
-    @Bind(R.id.tv_hint)
-    TextView tvHint;
-    @Bind(R.id.recyclerview_newgoods)
-    RecyclerView recyclerviewNewgoods;
-    @Bind(R.id.swipe_Refresh)
-    SwipeRefreshLayout swipeRefresh;
+public class BoutiqueSecondActivity extends AppCompatActivity {
 
+    @Bind(R.id.boutique_sencond_title_back)
+    ImageView boutiqueSencondTitleBack;
+    @Bind(R.id.boutique_sencond_title_text)
+    TextView boutiqueSencondTitleText;
+    @Bind(R.id.recyclerview_Boutique_Sencond)
+    RecyclerView recyclerviewBoutiqueSencond;
+    @Bind(R.id.boutique_sencond_swi)
+    SwipeRefreshLayout mSwi;
+    @Bind(R.id.boutique_sencond_hint)
+    TextView tvHint;
 
     GridLayoutManager mGridaLayoutManager;
-    StaggeredGridLayoutManager mStaggeredGridLayoutManager;
-
-    NewGoodsAdpter mNewGoodsAdapter;
     ArrayList<NewGoodsBean> list;
+    GoodsAdpter mGoodsAdapter;
+    int cat_id;
+
+
+    int mNewState;
 
 
     final int PAGE_SIZE=6;
@@ -62,52 +53,42 @@ public class NewGoodsFragment extends Fragment {
     final int PULL_DOWN_ACTION=1;
     final int BENGIE_ACTION=2;
 
-    int mNewState;
-
-
-    public NewGoodsFragment() {
-        // Required empty public constructor
-    }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_new_good, container, false);
-        ButterKnife.bind(this, view);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_boutique_second);
+        ButterKnife.bind(this);
         initView();
-        initDate();
+        initData();
         setListener();
         setManagerSpan();
-        return view;
-
     }
 
-    private void setManagerSpan() {
-        mGridaLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+    private void setListener() {
+        setRecycler();
+        setRefresh();
+        setBoutiqueSencondBack();
+    }
+
+    private void setBoutiqueSencondBack() {
+        boutiqueSencondTitleBack.setOnClickListener(new View.OnClickListener() {
             @Override
-            public int getSpanSize(int position) {
-                return position==mNewGoodsAdapter.getItemCount()-1?2:1;
+            public void onClick(View v) {
+                finish();
             }
         });
     }
 
-    //设置监听事件
-    private void setListener() {
-        setRefresh();
-        setRecycler();
-    }
-
     private void setRecycler() {
-        recyclerviewNewgoods.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        recyclerviewBoutiqueSencond.setOnScrollListener(new RecyclerView.OnScrollListener() {
 
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 mNewState=newState;
                 int lastPosition = mGridaLayoutManager.findLastVisibleItemPosition();
 
-                if(lastPosition>=mNewGoodsAdapter.getItemCount()-1&&newState==RecyclerView.SCROLL_STATE_IDLE
-                        &&mNewGoodsAdapter.isMore()){
+                if(lastPosition>=mGoodsAdapter.getItemCount()-1&&newState==RecyclerView.SCROLL_STATE_IDLE
+                        &&mGoodsAdapter.isMore()){
                     page_id++;
                     downData(page_id,PULL_UP_ACTION);
                 }
@@ -118,11 +99,11 @@ public class NewGoodsFragment extends Fragment {
     }
 
     private void setRefresh() {
-        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        mSwi.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                swipeRefresh.setEnabled(true);
-                swipeRefresh.setRefreshing(true);
+                mSwi.setEnabled(true);
+                mSwi.setRefreshing(true);
                 tvHint.setVisibility(View.VISIBLE);
                 page_id=1;
                 downData(page_id,PULL_DOWN_ACTION);
@@ -130,18 +111,34 @@ public class NewGoodsFragment extends Fragment {
         });
     }
 
-    private void initView() {
-        list=new ArrayList<>();
-        mGridaLayoutManager = new GridLayoutManager(getContext(),2,GridLayoutManager.VERTICAL,false);
-        mNewGoodsAdapter=new NewGoodsAdpter(list,getContext());
-        recyclerviewNewgoods.setLayoutManager(mGridaLayoutManager);
-        recyclerviewNewgoods.setAdapter(mNewGoodsAdapter);
+    private void setManagerSpan() {
+        mGridaLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return position==mGoodsAdapter.getItemCount()-1?2:1;
+            }
+        });
     }
 
+    private void initView() {
+        list=new ArrayList<>();
+        mGridaLayoutManager = new GridLayoutManager(this,2,GridLayoutManager.VERTICAL,false);
+        mGoodsAdapter=new GoodsAdpter(list,this);
+        recyclerviewBoutiqueSencond.setLayoutManager(mGridaLayoutManager);
+        recyclerviewBoutiqueSencond.setAdapter(mGoodsAdapter);
+        Intent intent = getIntent();
+        cat_id = intent.getIntExtra("cat_id",0);
+        String name = intent.getStringExtra("name");
+        boutiqueSencondTitleText.setText(name);
+    }
+
+    private void initData() {
+        downData(1,BENGIE_ACTION);
+    }
     private void downData(int page_id, final int action) {
-        final OkHttpUtils<NewGoodsBean[]> utils = new OkHttpUtils<>(getContext());
+        final OkHttpUtils<NewGoodsBean[]> utils = new OkHttpUtils<>(this);
         utils.setRequestUrl(I.REQUEST_FIND_NEW_BOUTIQUE_GOODS)
-                .addParam(I.GoodsDetails.KEY_CAT_ID,0+"")
+                .addParam(I.GoodsDetails.KEY_CAT_ID,cat_id+"")
                 .addParam(I.PAGE_ID,page_id+"")
                 .addParam(I.PAGE_SIZE,PAGE_SIZE+"")
                 .targetClass(NewGoodsBean[].class)
@@ -153,23 +150,23 @@ public class NewGoodsFragment extends Fragment {
                             list = utils.array2List(result);
                             switch (action){
                                 case BENGIE_ACTION:
-                                    mNewGoodsAdapter.initOrRefreshList(list);
+                                    mGoodsAdapter.initOrRefreshList(list);
                                     break;
                                 case PULL_DOWN_ACTION:
-                                    swipeRefresh.setRefreshing(false);
+                                    mSwi.setRefreshing(false);
                                     tvHint.setVisibility(View.GONE);
-                                    mNewGoodsAdapter.setMore(true);
-                                    mNewGoodsAdapter.initOrRefreshList(list);
+                                    mGoodsAdapter.setMore(true);
+                                    mGoodsAdapter.initOrRefreshList(list);
                                     ImageLoader.release();
                                     break;
                                 case PULL_UP_ACTION:
-                                    mNewGoodsAdapter.addList(list);
+                                    mGoodsAdapter.addList(list);
                                     break;
                             }
 
                         }else {
-                            mNewGoodsAdapter.setMore(false);
-                            mNewGoodsAdapter.notifyDataSetChanged();
+                            mGoodsAdapter.setMore(false);
+                            mGoodsAdapter.notifyDataSetChanged();
                         }
                     }
 
@@ -181,19 +178,9 @@ public class NewGoodsFragment extends Fragment {
 
     }
 
-    //初始化数据
-    private void initDate() {
-        downData(1,BENGIE_ACTION);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ButterKnife.unbind(this);
-    }
 
     //这是商品的ViewHolder
-    class NewGoodsViewHolder extends RecyclerView.ViewHolder {
+    class GoodsViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.iv_newgoods)
         ImageView ivNewgoods;
         @Bind(R.id.newgoods_name)
@@ -201,7 +188,7 @@ public class NewGoodsFragment extends Fragment {
         @Bind(R.id.newgoods_price)
         TextView newgoodsPrice;
 
-        public NewGoodsViewHolder(View itemView) {
+        public GoodsViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
         }
@@ -218,17 +205,14 @@ public class NewGoodsFragment extends Fragment {
         }
     }
 
-
-
-
     //现在开始定义适配器 Adapter
-    class NewGoodsAdpter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+    class GoodsAdpter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
         private ArrayList<NewGoodsBean> newGoodsBeenList;
         private Context context;
 
         //这是构造器用来降低耦合度
-        public NewGoodsAdpter(ArrayList<NewGoodsBean> goodsBeenList, Context context) {
+        public GoodsAdpter(ArrayList<NewGoodsBean> goodsBeenList, Context context) {
             this.newGoodsBeenList = goodsBeenList;
             this.context = context;
         }
@@ -265,7 +249,7 @@ public class NewGoodsFragment extends Fragment {
                 return viewHolder;
             }
             View viewNewGoods = View.inflate(context,R.layout.newgoods_item,null);
-            viewHolder = new NewGoodsViewHolder(viewNewGoods);
+            viewHolder = new GoodsViewHolder(viewNewGoods);
             //这里给itemView设置点击事件
             //长按进入商品详情
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -274,7 +258,7 @@ public class NewGoodsFragment extends Fragment {
                     int id = (int) v.getTag();
                     Intent intent = new Intent();
                     intent.putExtra("id",id);
-                    MFGT.startActivity((MainActivity) context, GoodsDetailsActivity.class,intent);
+                    MFGT.startActivity((BoutiqueSecondActivity) context, GoodsDetailsActivity.class,intent);
                 }
             });
             return viewHolder;
@@ -295,7 +279,7 @@ public class NewGoodsFragment extends Fragment {
                 return;
             }
             NewGoodsBean newGoodsBean = newGoodsBeenList.get(position);
-            NewGoodsViewHolder newGoodsViewHolder = (NewGoodsViewHolder) holder;
+            GoodsViewHolder newGoodsViewHolder = (GoodsViewHolder) holder;
             newGoodsViewHolder.newgoodsName.setText(newGoodsBean.getGoodsName());
             newGoodsViewHolder.newgoodsPrice.setText(newGoodsBean.getShopPrice());
             //把商品的id通过itemView的tag传回去
@@ -341,4 +325,13 @@ public class NewGoodsFragment extends Fragment {
             return NEW_GOODS_TYPE;
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        MFGT.finish(this);
+    }
+
+
+
 }

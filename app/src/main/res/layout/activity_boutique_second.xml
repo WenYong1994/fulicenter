@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/boutique_sencond_swi"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+        <RelativeLayout
+            android:background="@color/good_detail_title_bg"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:gravity="center_vertical"
+            >
+            <ImageView
+                android:layout_marginLeft="5dp"
+                android:id="@+id/boutique_sencond_title_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/back_nomal"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="精选的Title"
+                android:id="@+id/boutique_sencond_title_text"
+                android:textColor="#fff"
+                android:textSize="15dp"
+                android:layout_toRightOf="@id/boutique_sencond_title_back"
+                android:layout_marginTop="3dp"
+                android:layout_marginLeft="10dp"
+                />
+        </RelativeLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="加载中…"
+            android:visibility="gone"
+            android:gravity="center_horizontal"
+            android:textSize="20dp"
+            android:id="@+id/boutique_sencond_hint"
+            />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview_Boutique_Sencond"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </android.support.v7.widget.RecyclerView>
+
+    </LinearLayout>
+</android.support.v4.widget.SwipeRefreshLayout>
