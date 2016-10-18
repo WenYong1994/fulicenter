@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="300dp"
+    android:orientation="horizontal">
+    <ImageView
+        android:layout_gravity="center_vertical"
+        android:id="@+id/boutique_first_imageview"
+        android:src="@drawable/nopic"
+        android:layout_width="220dp"
+        android:layout_height="280dp"
+        android:scaleType="fitXY"
+        />
+    <LinearLayout
+        android:layout_marginLeft="15dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="300dp">
+        <TextView
+            android:gravity="center_vertical"
+            android:id="@+id/boutique_first_textview_one"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="不一样的新装，不一样的美丽"
+            android:textColor="#ef5b5b"
+            android:textSize="20dp"
+            />
+        <TextView
+            android:gravity="center_vertical"
+            android:id="@+id/boutique_first_textview_two"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="拯救头发，美丽新装"
+            android:textSize="24dp"
+            android:textColor="#000000"
+            />
+        <TextView
+            android:gravity="center_vertical"
+            android:id="@+id/boutique_first_textview_three"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="快速增长修护预防脱发洗发…"
+            android:textSize="22dp"
+
+            />
+    </LinearLayout>
+
+</LinearLayout>
