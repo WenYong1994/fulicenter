@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +29,7 @@ import butterknife.ButterKnife;
 import cn.ucai.fulicenter.R;
 import cn.ucai.fulicenter.bean.AlbumsBean;
 import cn.ucai.fulicenter.bean.GoodsDetailsBean;
+import cn.ucai.fulicenter.utils.CommonUtils;
 import cn.ucai.fulicenter.utils.I;
 import cn.ucai.fulicenter.utils.ImageLoader;
 import cn.ucai.fulicenter.utils.L;
@@ -62,6 +64,8 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
     ViewPager mGoodsDetailsImageViewPager;
     @Bind(R.id.good_detail_cercle)
     Cercle mGoodDetailCercle;
+    @Bind(R.id.good_detail_title_cars_hint)
+    TextView nGoodDetailTitlCarsHint;
 
     //定义一个数组来存储商品详情的图片uri
     ArrayList<AlbumsBean> mAlbumsBeanList;
@@ -156,11 +160,10 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
                     }
                     @Override
                     public void onError(String error) {
-                        Toast.makeText(GoodsDetailsActivity.this, "下载失败", Toast.LENGTH_SHORT).show();
+                        CommonUtils.showShortToast(error);
                     }
                 });
     }
-
     private void initAdapter() {
         mImagerViewList =new ArrayList<>();
         for(AlbumsBean albumsBean : mAlbumsBeanList){

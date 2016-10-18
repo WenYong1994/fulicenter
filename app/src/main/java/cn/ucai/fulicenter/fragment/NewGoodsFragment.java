@@ -261,14 +261,13 @@ public class NewGoodsFragment extends Fragment {
             viewHolder = new NewGoodsViewHolder(viewNewGoods);
             //这里给itemView设置点击事件
             //长按进入商品详情
-            viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public boolean onLongClick(View v) {
+                public void onClick(View v) {
                     int id = (int) v.getTag();
                     Intent intent = new Intent();
                     intent.putExtra("id",id);
                     MFGT.startActivity((MainActivity) context, GoodsDetailsActivity.class,intent);
-                    return true;
                 }
             });
             return viewHolder;

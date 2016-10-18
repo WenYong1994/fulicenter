@@ -2,8 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-android:layout_width="match_parent"
-android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
     <RelativeLayout
         android:background="@color/good_detail_title_bg"
         android:layout_width="match_parent"
@@ -45,14 +46,29 @@ android:layout_height="match_parent">
             android:src="@mipmap/bg_collect_in"
             android:layout_toLeftOf="@id/good_detail_title_share"
             />
-        <ImageView
-            android:id="@+id/good_detail_title_cars"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@mipmap/bg_cart_selected"
+        <RelativeLayout
             android:layout_toLeftOf="@id/good_detail_title_collect"
             android:layout_marginRight="10dp"
-            />
+            android:layout_width="26dp"
+            android:layout_height="25dp">
+            <ImageView
+                android:id="@+id/good_detail_title_cars"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/bg_cart_selected"
+                android:layout_marginTop="1dp"
+                />
+            <TextView
+                android:id="@+id/good_detail_title_cars_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4"
+                android:textColor="#ff0004"
+                android:layout_alignRight="@id/good_detail_title_cars"
+                android:layout_marginTop="-6dp"
+                />
+        </RelativeLayout>
+
     </RelativeLayout>
     <TextView
         android:layout_width="match_parent"
@@ -65,7 +81,7 @@ android:layout_height="match_parent">
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/defult_thumb"
-        android:visibility="gone"
+        android:visibility="visible"
         />
     <RelativeLayout
         android:gravity="center"
