@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
@@ -42,6 +43,11 @@ public class CategoryFragment extends BaseFragment {
 
     CategoryExpandAdpter mAdapter;
 
+    //定义一个全局变量来保存expandableListView的哪个posotion被打开
+    int whoExpand;
+    boolean isExpand=false;
+
+
     final int PAGE_SIZE= 10;
 
     public CategoryFragment() {
@@ -58,7 +64,33 @@ public class CategoryFragment extends BaseFragment {
         super.onCreateView(inflater,container,savedInstanceState);
 //        downData();
 //        initView();
+        setListener();
         return view;
+    }
+
+    private void setListener() {
+        categoryExpandableListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                Toast.makeText(FuLiCenterApplication.getInstance(), "开始拖动", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if(isExpand){
+                    //先通过那个被打开，来获取。被展开的展开项里有多少个数据。来判断展开项的最后一再是在第几个。
+                    int isExpandChildrenCount = mAdapter.getChildrenCount(whoExpand);
+                    int childrenLastPosition = isExpandChildrenCount+whoExpand;
+                    //这就表示显示到最后一个了，可以加载下一页数据了。
+                    if(childrenLastPosition<=view.getLastVisiblePosition()&&mAdapter.getIsMore(whoExpand)){
+                        mAdapter.page_idArr[whoExpand]++;
+                        CategoryGroupBean bean = mAdapter.getGroup(whoExpand);
+                        downChildData(bean.getId(),mAdapter.page_idArr[whoExpand],whoExpand);
+                    }
+                    //L.i("childrenLastPosition:"+childrenLastPosition+",view.getLastVisiblePosition()"+view.getLastVisiblePosition());
+                }
+            }
+        });
     }
 
     public void initView() {
@@ -104,6 +136,10 @@ public class CategoryFragment extends BaseFragment {
                         if(result!=null&&result.length!=0){
                             ArrayList<CategoryChildBean> list= utils.array2List(result);
                             mAdapter.addChildList(list,groupPosition);
+                        }else {
+                            //没有更多数据了
+                            //Toast.makeText(FuLiCenterApplication.getInstance(), "没有跟多数据了", Toast.LENGTH_SHORT).show();
+                            mAdapter.setIsMore(false,groupPosition);
                         }
                     }
                     @Override
@@ -115,18 +151,33 @@ public class CategoryFragment extends BaseFragment {
 
 
     class CategoryExpandAdpter extends BaseExpandableListAdapter {
+
+        //用来保存每一个大类里面小类分页加载的页数
+        int[]  page_idArr;
+        //用来保存每一个大类里面的小类是否还有更多数据
+        boolean[] isMore;
         ArrayList<ArrayList<CategoryChildBean>> childList;
         ArrayList<CategoryGroupBean> groupList;
         Context context;
         //带你以一个boolen数组保存这个Group是否已近被下载
         boolean[] isGroupDownArr;
 
-        public void initList(ArrayList<ArrayList<CategoryChildBean>> childList,ArrayList<CategoryGroupBean> groupList){
+        public boolean getIsMore(int groupPosition) {
+            return isMore[groupPosition];
+        }
 
+        public void setIsMore(boolean is,int groupPosition) {
+            this.isMore[groupPosition]=is;
+        }
+
+        public void initList(ArrayList<ArrayList<CategoryChildBean>> childList, ArrayList<CategoryGroupBean> groupList){
+
+            //这下面是通过大类的个数，来初始化一下数据
             this.childList.clear();
             this.groupList.clear();
             this.isGroupDownArr=new boolean[groupList.size()];
-
+            this.isMore = new boolean[groupList.size()];
+            this.page_idArr=new int[groupList.size()];
             if(childList!=null){
                 this.childList.addAll(childList);
             }
@@ -137,6 +188,8 @@ public class CategoryFragment extends BaseFragment {
             for (int i=0;i<groupList.size();i++){
                 this.childList.add(new ArrayList<CategoryChildBean>());
                 isGroupDownArr[i]=false;
+                isMore[i]=true;
+                page_idArr[i]=1;
             }
         }
         public CategoryExpandAdpter(ArrayList<ArrayList<CategoryChildBean>> childList, ArrayList<CategoryGroupBean> groupList, Context context) {
@@ -281,15 +334,17 @@ public class CategoryFragment extends BaseFragment {
                         if(categoryExpandableListView.isGroupExpanded(position)){
                             //关闭此项
                             categoryExpandableListView.collapseGroup(position);
-
+                            isExpand=false;
                         }else {
                             //展开此项
                             categoryExpandableListView.expandGroup(position);
                             CategoryGroupBean bean = groupList.get(position);
+                            whoExpand=position;
+                            isExpand=true;
                             //这里判断以前是否已近加载过了，如果是已近加载过了，就不用再下载
                             if(!isGroupDownArr[position]){
                                 isGroupDownArr[position]=true;
-                                downChildData(bean.getId(),1,position);
+                                downChildData(bean.getId(),page_idArr[position],position);
                             }
                         }
                         //下面关闭其他项

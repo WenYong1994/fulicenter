@@ -55,7 +55,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.BoutiqueSecondActivity"></activity>
+        <activity android:name=".activity.BoutiqueSecondActivity" />
+        <activity android:name=".activity.CategoryListActivity"></activity>
     </application>
 
 </manifest>
