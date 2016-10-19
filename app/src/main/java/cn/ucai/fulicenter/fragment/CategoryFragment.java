@@ -257,10 +257,10 @@ public class CategoryFragment extends Fragment {
                             L.e("展开此项");
                         }
                         //下面关闭其他项
-                        for(int i=1;i<=getGroupCount();i++){
+                        for(int i=0;i<getGroupCount();i++){
                             if(i!=position){
                                 //关闭此项
-                                categoryExpandableListView.collapseGroup(position);
+                                categoryExpandableListView.collapseGroup(i);
                             }
                         }
                         Toast.makeText(FuLiCenterApplication.getInstance(),"position:"+position+",name:"+getGroup(position).getName(), Toast.LENGTH_SHORT).show();
