@@ -74,7 +74,7 @@ public class BoutiqueSecondActivity extends AppCompatActivity {
         boutiqueSencondTitleBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                MFGT.finish(BoutiqueSecondActivity.this);
             }
         });
     }

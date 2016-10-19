@@ -84,7 +84,6 @@ public class CategoryFragment extends BaseFragment {
                             Toast.makeText(FuLiCenterApplication.getInstance(), "加载数据失败", Toast.LENGTH_SHORT).show();
                         }
                     }
-
                     @Override
                     public void onError(String error) {
                         L.e(error);
@@ -92,7 +91,7 @@ public class CategoryFragment extends BaseFragment {
                 });
     }
 
-    private void downChildData(int parent_id, int page_id){
+    private void downChildData(int parent_id, int page_id, final int groupPosition){
         final OkHttpUtils<CategoryChildBean[]> utils = new OkHttpUtils<>(getContext());
         utils.url(I.SERVER_ROOT+I.REQUEST_FIND_CATEGORY_CHILDREN)
                 .addParam(I.CategoryChild.PARENT_ID,parent_id+"")
@@ -104,7 +103,7 @@ public class CategoryFragment extends BaseFragment {
                     public void onSuccess(CategoryChildBean[] result) {
                         if(result!=null&&result.length!=0){
                             ArrayList<CategoryChildBean> list= utils.array2List(result);
-                            mAdapter.addChildList(list);
+                            mAdapter.addChildList(list,groupPosition);
                         }
                     }
                     @Override
@@ -116,15 +115,18 @@ public class CategoryFragment extends BaseFragment {
 
 
     class CategoryExpandAdpter extends BaseExpandableListAdapter {
-
         ArrayList<ArrayList<CategoryChildBean>> childList;
         ArrayList<CategoryGroupBean> groupList;
         Context context;
+        //带你以一个boolen数组保存这个Group是否已近被下载
+        boolean[] isGroupDownArr;
 
         public void initList(ArrayList<ArrayList<CategoryChildBean>> childList,ArrayList<CategoryGroupBean> groupList){
 
             this.childList.clear();
             this.groupList.clear();
+            this.isGroupDownArr=new boolean[groupList.size()];
+
             if(childList!=null){
                 this.childList.addAll(childList);
             }
@@ -132,8 +134,11 @@ public class CategoryFragment extends BaseFragment {
                 this.groupList.addAll(groupList);
             }
             notifyDataSetChanged();
+            for (int i=0;i<groupList.size();i++){
+                this.childList.add(new ArrayList<CategoryChildBean>());
+                isGroupDownArr[i]=false;
+            }
         }
-
         public CategoryExpandAdpter(ArrayList<ArrayList<CategoryChildBean>> childList, ArrayList<CategoryGroupBean> groupList, Context context) {
             this.childList = childList;
             this.groupList = groupList;
@@ -147,7 +152,6 @@ public class CategoryFragment extends BaseFragment {
 
         @Override
         public int getChildrenCount(int groupPosition) {
-
             return (childList == null||childList.size()==0||childList.get(groupPosition)==null
                     ||childList.get(groupPosition).size()==0) ? 0 : childList.get(groupPosition).size();
         }
@@ -177,9 +181,14 @@ public class CategoryFragment extends BaseFragment {
             return false;
         }
 
-        public void addChildList(ArrayList<CategoryChildBean> list){
-            this.childList.add(list);
+        public void addChildList(ArrayList<CategoryChildBean> list,int groupPosition){
+
+            this.childList.get(groupPosition).addAll(list);
             notifyDataSetChanged();
+        }
+
+        public void removeChildList(int groupPosition){
+            this.childList.get(groupPosition).clear();
         }
 
         @Override
@@ -272,11 +281,16 @@ public class CategoryFragment extends BaseFragment {
                         if(categoryExpandableListView.isGroupExpanded(position)){
                             //关闭此项
                             categoryExpandableListView.collapseGroup(position);
-                            L.i("关闭此项");
+
                         }else {
                             //展开此项
                             categoryExpandableListView.expandGroup(position);
-                            L.e("展开此项");
+                            CategoryGroupBean bean = groupList.get(position);
+                            //这里判断以前是否已近加载过了，如果是已近加载过了，就不用再下载
+                            if(!isGroupDownArr[position]){
+                                isGroupDownArr[position]=true;
+                                downChildData(bean.getId(),1,position);
+                            }
                         }
                         //下面关闭其他项
                         for(int i=0;i<getGroupCount();i++){
@@ -286,8 +300,6 @@ public class CategoryFragment extends BaseFragment {
                             }
                         }
                         //Toast.makeText(FuLiCenterApplication.getInstance(),"position:"+position+",name:"+getGroup(position).getName(), Toast.LENGTH_SHORT).show();
-                        CategoryGroupBean bean = groupList.get(position);
-                        downChildData(bean.getId(),1);
                     }
                 });
             }

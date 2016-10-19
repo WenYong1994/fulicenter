@@ -154,7 +154,7 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
         mgoodDetailTitleBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                MFGT.finish(GoodsDetailsActivity.this);
             }
         });
     }

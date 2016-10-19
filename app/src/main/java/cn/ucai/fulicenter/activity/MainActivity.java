@@ -12,6 +12,7 @@ import cn.ucai.fulicenter.fragment.BoutiqueFragment;
 import cn.ucai.fulicenter.fragment.CategoryFragment;
 import cn.ucai.fulicenter.fragment.NewGoodsFragment;
 import cn.ucai.fulicenter.utils.L;
+import cn.ucai.fulicenter.utils.MFGT;
 
 public class MainActivity extends AppCompatActivity {
     RadioButton mRabtn_NewGoods,mRabtn_Boutique,
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
     }
+
 
     private void mutual(RadioButton rabtn){
         if(rabtn!=mRabtn_Boutique){
