@@ -9,6 +9,7 @@ import android.widget.RadioButton;
 
 import cn.ucai.fulicenter.R;
 import cn.ucai.fulicenter.fragment.BoutiqueFragment;
+import cn.ucai.fulicenter.fragment.CategoryFragment;
 import cn.ucai.fulicenter.fragment.NewGoodsFragment;
 import cn.ucai.fulicenter.utils.L;
 
@@ -54,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
                 ftBoutique.commit();
                 break;
             case R.id.rb_id_category:
+                FragmentTransaction ftCategory = getSupportFragmentManager().beginTransaction();
+                CategoryFragment fragment = new CategoryFragment();
+                ftCategory.replace(R.id.newgoods_fragment_one,fragment);
+                ftCategory.commit();
                 mutual((RadioButton) v);
                 break;
             case R.id.rb_id_cars:
