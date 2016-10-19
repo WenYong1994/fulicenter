@@ -63,6 +63,8 @@ public class CategoryFragment extends Fragment {
         mGroupList=new ArrayList<>();
         mGhildList= new ArrayList<>();
         mAdapter=new CategoryExpandAdpter(mGhildList,mGroupList,getContext());
+        categoryExpandableListView.setGroupIndicator(null);
+        categoryExpandableListView.setChildIndicator(null);
         categoryExpandableListView.setAdapter(mAdapter);
     }
 
@@ -174,9 +176,9 @@ public class CategoryFragment extends Fragment {
                     .placeholder(R.drawable.nopic)
                     .into(holder.categoryGroupImageView);
             if(isExpanded){
-                holder.categoryGroupArrow.setImageResource(R.drawable.arrow2_up);
+                holder.categoryGroupArrow.setImageResource(R.mipmap.expand_on);
             }else {
-                holder.categoryGroupArrow.setImageResource(R.drawable.arrow2_down);
+                holder.categoryGroupArrow.setImageResource(R.mipmap.expand_off);
             }
             return convertView;
         }
