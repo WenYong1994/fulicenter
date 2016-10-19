@@ -130,16 +130,18 @@ public class CategoryFragment extends Fragment {
 
         @Override
         public int getChildrenCount(int groupPosition) {
-            return childList == null ? 0 : childList.get(groupPosition).size();
+
+            return (childList == null||childList.size()==0||childList.get(groupPosition)==null
+                    ||childList.get(groupPosition).size()==0) ? 0 : childList.get(groupPosition).size();
         }
 
         @Override
-        public Object getGroup(int groupPosition) {
+        public CategoryGroupBean getGroup(int groupPosition) {
             return groupList.get(groupPosition);
         }
 
         @Override
-        public Object getChild(int groupPosition, int childPosition) {
+        public CategoryChildBean getChild(int groupPosition, int childPosition) {
             return childList.get(groupPosition).get(childPosition);
         }
 
@@ -164,11 +166,12 @@ public class CategoryFragment extends Fragment {
             GroupViewHolder holder=null;
             if(convertView==null){
                 convertView = View.inflate(context,R.layout.category_group_item,null);
-                holder= new GroupViewHolder(convertView);
+                holder= new GroupViewHolder(convertView,groupPosition);
                 convertView.setTag(holder);
             }else {
                 holder  = (GroupViewHolder) convertView.getTag();
             }
+            holder.position=groupPosition;
             holder.categoryGroupText.setText(bean.getName());
             Picasso.with(context)
                     .load(I.DOWNLOAD_IMG_URL+bean.getImageUrl())
@@ -176,9 +179,9 @@ public class CategoryFragment extends Fragment {
                     .placeholder(R.drawable.nopic)
                     .into(holder.categoryGroupImageView);
             if(isExpanded){
-                holder.categoryGroupArrow.setImageResource(R.mipmap.expand_on);
-            }else {
                 holder.categoryGroupArrow.setImageResource(R.mipmap.expand_off);
+            }else {
+                holder.categoryGroupArrow.setImageResource(R.mipmap.expand_on);
             }
             return convertView;
         }
@@ -194,13 +197,14 @@ public class CategoryFragment extends Fragment {
             }else {
                 holder= (ChildViewHolder) convertView.getTag();
             }
+
             holder.categoryChildText.setText(bean.getName());
             Picasso.with(context)
                     .load(I.DOWNLOAD_IMG_URL+bean.getImageUrl())
                     .error(R.drawable.nopic)
                     .placeholder(R.drawable.nopic)
                     .into(holder.categoryChildImage);
-            return null;
+            return convertView;
         }
 
         @Override
@@ -213,7 +217,6 @@ public class CategoryFragment extends Fragment {
             ImageView categoryChildImage;
             @Bind(R.id.category_child_text)
             TextView categoryChildText;
-
             ChildViewHolder(View view) {
                 ButterKnife.bind(this, view);
             }
@@ -226,17 +229,46 @@ public class CategoryFragment extends Fragment {
             TextView categoryGroupText;
             @Bind(R.id.category_group_arrow)
             ImageView categoryGroupArrow;
+            private int position;
 
-            GroupViewHolder(View view) {
+            public int getPosition() {
+                return position;
+            }
+
+            public void setPosition(int position) {
+                this.position = position;
+            }
+
+            GroupViewHolder(View view, int position) {
+                this.position=position;
                 ButterKnife.bind(this, view);
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        GroupViewHolder holer  = (GroupViewHolder) v.getTag();
+                        int position = holer.position;
+                        if(categoryExpandableListView.isGroupExpanded(position)){
+                            //关闭此项
+                            categoryExpandableListView.collapseGroup(position);
+                            L.i("关闭此项");
+                        }else {
+                            //展开此项
+                            categoryExpandableListView.expandGroup(position);
+                            L.e("展开此项");
+                        }
+                        //下面关闭其他项
+                        for(int i=1;i<=getGroupCount();i++){
+                            if(i!=position){
+                                //关闭此项
+                                categoryExpandableListView.collapseGroup(position);
+                            }
+                        }
+                        Toast.makeText(FuLiCenterApplication.getInstance(),"position:"+position+",name:"+getGroup(position).getName(), Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         }
-
-
-
     }
-
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();

@@ -5,14 +5,13 @@
     android:layout_height="50dp">
     <ImageView
         android:id="@+id/category_group_imageView"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="50dp"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:scaleType="fitXY"
         android:src="@drawable/nopic"
         />
     <TextView
-        android:layout_toRightOf="@id/category_group_imageView"
         android:id="@+id/category_group_text"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -20,15 +19,18 @@
         android:text="最IN"
         android:textColor="#000000"
         android:textSize="23dp"
+        android:layout_toRightOf="@+id/category_group_imageView"
+        android:layout_marginLeft="38dp"
         />
         <ImageView
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="0dp"
+            android:layout_marginRight="50dp"
             android:id="@+id/category_group_arrow"
             android:layout_width="40dp"
             android:layout_height="20dp"
             android:src="@mipmap/arrow2_down"
+
         />
 
 </RelativeLayout>

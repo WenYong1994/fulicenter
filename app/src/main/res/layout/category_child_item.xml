@@ -5,18 +5,22 @@
     android:orientation="horizontal"
     android:layout_height="50dp">
     <LinearLayout
-        android:layout_weight="3"
+        android:layout_weight="5"
         android:layout_width="0dp"
         android:layout_height="match_parent">
 
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="6"
+        android:layout_height="match_parent">
     <ImageView
         android:id="@+id/category_child_image"
         android:src="@drawable/category_child"
         android:layout_width="50dp"
-        android:layout_weight="6"
         android:scaleType="fitXY"
         android:layout_height="50dp" />
+    </LinearLayout>
     <TextView
         android:id="@+id/category_child_text"
         android:layout_marginLeft="10dp"
