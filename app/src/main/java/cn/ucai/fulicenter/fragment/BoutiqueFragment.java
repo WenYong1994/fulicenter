@@ -39,7 +39,7 @@ import cn.ucai.fulicenter.utils.OkHttpUtils;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class BoutiqueFragment extends Fragment {
+public class BoutiqueFragment extends BaseFragment {
 
     View view;
     @Bind(R.id.tv_hint_Boutique_First)
@@ -75,11 +75,13 @@ public class BoutiqueFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_boutique, container, false);
         ButterKnife.bind(this, view);
-        initViwe();
-        downData();
+        //initView();
+        //downData();
+        super.onCreateView(inflater,container,savedInstanceState);
         setLisener();
         return view;
     }
+
 
     private void setLisener() {
         swipeRefreshBoutiqueFirst.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -93,7 +95,8 @@ public class BoutiqueFragment extends Fragment {
         });
     }
 
-    private void initViwe() {
+    @Override
+    public void initView() {
         list = new ArrayList<>();
         mAdpter = new BoutiqueFragmentAdpter(list,getContext());
         recyclerviewBoutique.setAdapter(mAdpter);
@@ -101,7 +104,8 @@ public class BoutiqueFragment extends Fragment {
         recyclerviewBoutique.setLayoutManager(mManager);
     }
 
-    private void downData() {
+    @Override
+    public void downData() {
         final OkHttpUtils<BouiqueBean[]> myutils = new OkHttpUtils<BouiqueBean[]>(getContext());
         myutils.url(I.SERVER_ROOT+I.REQUEST_FIND_BOUTIQUES)
                 .targetClass(BouiqueBean[].class)

@@ -23,6 +23,7 @@ import cn.ucai.fulicenter.R;
 import cn.ucai.fulicenter.application.FuLiCenterApplication;
 import cn.ucai.fulicenter.bean.CategoryChildBean;
 import cn.ucai.fulicenter.bean.CategoryGroupBean;
+import cn.ucai.fulicenter.utils.CommonUtils;
 import cn.ucai.fulicenter.utils.I;
 import cn.ucai.fulicenter.utils.L;
 import cn.ucai.fulicenter.utils.OkHttpUtils;
@@ -30,7 +31,7 @@ import cn.ucai.fulicenter.utils.OkHttpUtils;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CategoryFragment extends Fragment {
+public class CategoryFragment extends BaseFragment {
 
 
     ArrayList<CategoryGroupBean> mGroupList;
@@ -54,12 +55,13 @@ public class CategoryFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_category, container, false);
         ButterKnife.bind(this, view);
-        downData();
-        initView();
+        super.onCreateView(inflater,container,savedInstanceState);
+//        downData();
+//        initView();
         return view;
     }
 
-    private void initView() {
+    public void initView() {
         mGroupList=new ArrayList<>();
         mGhildList= new ArrayList<>();
         mAdapter=new CategoryExpandAdpter(mGhildList,mGroupList,getContext());
@@ -68,7 +70,7 @@ public class CategoryFragment extends Fragment {
         categoryExpandableListView.setAdapter(mAdapter);
     }
 
-    private void downData() {
+    public void downData() {
         final OkHttpUtils<CategoryGroupBean[]> utils = new OkHttpUtils<>(getContext());
         utils.url(I.SERVER_ROOT+I.REQUEST_FIND_CATEGORY_GROUP)
                 .targetClass(CategoryGroupBean[].class)
@@ -78,9 +80,6 @@ public class CategoryFragment extends Fragment {
                         if(result!=null|result.length!=0){
                             ArrayList<CategoryGroupBean> listGroup = utils.array2List(result);
                             mAdapter.initList(null,listGroup);
-                            for(CategoryGroupBean bean: listGroup){
-
-                            }
                         }else {
                             Toast.makeText(FuLiCenterApplication.getInstance(), "加载数据失败", Toast.LENGTH_SHORT).show();
                         }
@@ -93,8 +92,26 @@ public class CategoryFragment extends Fragment {
                 });
     }
 
-    private void downChildData(String uri,int page_id){
-
+    private void downChildData(int parent_id, int page_id){
+        final OkHttpUtils<CategoryChildBean[]> utils = new OkHttpUtils<>(getContext());
+        utils.url(I.SERVER_ROOT+I.REQUEST_FIND_CATEGORY_CHILDREN)
+                .addParam(I.CategoryChild.PARENT_ID,parent_id+"")
+                .addParam(I.PAGE_ID,page_id+"")
+                .addParam(I.PAGE_SIZE,PAGE_SIZE+"")
+                .targetClass(CategoryChildBean[].class)
+                .execute(new OkHttpUtils.OnCompleteListener<CategoryChildBean[]>() {
+                    @Override
+                    public void onSuccess(CategoryChildBean[] result) {
+                        if(result!=null&&result.length!=0){
+                            ArrayList<CategoryChildBean> list= utils.array2List(result);
+                            mAdapter.addChildList(list);
+                        }
+                    }
+                    @Override
+                    public void onError(String error) {
+                        CommonUtils.showShortToast("请求数据失败");
+                    }
+                });
     }
 
 
@@ -158,6 +175,11 @@ public class CategoryFragment extends Fragment {
         @Override
         public boolean hasStableIds() {
             return false;
+        }
+
+        public void addChildList(ArrayList<CategoryChildBean> list){
+            this.childList.add(list);
+            notifyDataSetChanged();
         }
 
         @Override
@@ -263,7 +285,9 @@ public class CategoryFragment extends Fragment {
                                 categoryExpandableListView.collapseGroup(i);
                             }
                         }
-                        Toast.makeText(FuLiCenterApplication.getInstance(),"position:"+position+",name:"+getGroup(position).getName(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(FuLiCenterApplication.getInstance(),"position:"+position+",name:"+getGroup(position).getName(), Toast.LENGTH_SHORT).show();
+                        CategoryGroupBean bean = groupList.get(position);
+                        downChildData(bean.getId(),1);
                     }
                 });
             }
