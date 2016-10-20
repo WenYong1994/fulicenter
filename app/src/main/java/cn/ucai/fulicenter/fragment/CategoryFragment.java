@@ -1,7 +1,9 @@
 package cn.ucai.fulicenter.fragment;
 
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -17,16 +19,20 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cn.ucai.fulicenter.R;
+import cn.ucai.fulicenter.activity.CategoryListActivity;
+import cn.ucai.fulicenter.activity.MainActivity;
 import cn.ucai.fulicenter.application.FuLiCenterApplication;
 import cn.ucai.fulicenter.bean.CategoryChildBean;
 import cn.ucai.fulicenter.bean.CategoryGroupBean;
 import cn.ucai.fulicenter.utils.CommonUtils;
 import cn.ucai.fulicenter.utils.I;
 import cn.ucai.fulicenter.utils.L;
+import cn.ucai.fulicenter.utils.MFGT;
 import cn.ucai.fulicenter.utils.OkHttpUtils;
 
 /**
@@ -42,6 +48,8 @@ public class CategoryFragment extends BaseFragment {
     ExpandableListView categoryExpandableListView;
 
     CategoryExpandAdpter mAdapter;
+    //用来判断是否在拖动中
+    int newState;
 
     //定义一个全局变量来保存expandableListView的哪个posotion被打开
     int whoExpand;
@@ -72,7 +80,8 @@ public class CategoryFragment extends BaseFragment {
         categoryExpandableListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
-                Toast.makeText(FuLiCenterApplication.getInstance(), "开始拖动", Toast.LENGTH_SHORT).show();
+                newState=scrollState;
+                //Toast.makeText(FuLiCenterApplication.getInstance(), "开始拖动", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -82,12 +91,15 @@ public class CategoryFragment extends BaseFragment {
                     int isExpandChildrenCount = mAdapter.getChildrenCount(whoExpand);
                     int childrenLastPosition = isExpandChildrenCount+whoExpand;
                     //这就表示显示到最后一个了，可以加载下一页数据了。
-                    if(childrenLastPosition<=view.getLastVisiblePosition()&&mAdapter.getIsMore(whoExpand)){
+                    if(childrenLastPosition==view.getLastVisiblePosition()&&mAdapter.getIsMore(whoExpand)){
                         mAdapter.page_idArr[whoExpand]++;
+//                        L.i("显示到最后一个了");
+//                        L.i("第几个被展开:"+(whoExpand+1));
+//                        L.i("第几页被加载"+mAdapter.page_idArr[whoExpand]);
                         CategoryGroupBean bean = mAdapter.getGroup(whoExpand);
                         downChildData(bean.getId(),mAdapter.page_idArr[whoExpand],whoExpand);
                     }
-                    //L.i("childrenLastPosition:"+childrenLastPosition+",view.getLastVisiblePosition()"+view.getLastVisiblePosition());
+                   // L.i("firstVisibleItem:"+firstVisibleItem+",visibleItemCount:"+visibleItemCount+",totalItemCount+"+totalItemCount);
                 }
             }
         });
@@ -148,7 +160,6 @@ public class CategoryFragment extends BaseFragment {
                     }
                 });
     }
-
 
     class CategoryExpandAdpter extends BaseExpandableListAdapter {
 
@@ -281,6 +292,11 @@ public class CategoryFragment extends BaseFragment {
             }else {
                 holder= (ChildViewHolder) convertView.getTag();
             }
+            //将cat_id，和对应group的name封装到holder里面
+            holder.cat_id=bean.getId();
+            CategoryGroupBean beanGroup = groupList.get(groupPosition);
+            holder.parentName = beanGroup.getName();
+
 
             holder.categoryChildText.setText(bean.getName());
             Picasso.with(context)
@@ -295,14 +311,34 @@ public class CategoryFragment extends BaseFragment {
         public boolean isChildSelectable(int groupPosition, int childPosition) {
             return false;
         }
+
+
+
         //定义两个封装类，用来优化ListView
         class ChildViewHolder {
             @Bind(R.id.category_child_image)
             ImageView categoryChildImage;
             @Bind(R.id.category_child_text)
             TextView categoryChildText;
+            String parentName;
+            int cat_id ;
+
+
             ChildViewHolder(View view) {
                 ButterKnife.bind(this, view);
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ChildViewHolder holder = (ChildViewHolder) v.getTag();
+                        String groupName = holder.parentName;
+                        int cat_id = holder.cat_id;
+                        Intent intent = new Intent();
+                        intent.putExtra("groupName",groupName);
+                        intent.putExtra("cat_id",cat_id);
+                        //Toast.makeText(FuLiCenterApplication.getInstance(), "groupName:"+groupName+"cat_id"+cat_id, Toast.LENGTH_SHORT).show();
+                        MFGT.startActivity((MainActivity) context, CategoryListActivity.class,intent);
+                    }
+                });
             }
         }
 
