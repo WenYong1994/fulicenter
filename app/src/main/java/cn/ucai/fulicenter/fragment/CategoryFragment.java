@@ -338,6 +338,7 @@ public class CategoryFragment extends BaseFragment {
                         intent.putExtra("groupName",groupName);
                         intent.putExtra("cat_id",cat_id);
                         intent.putExtra("groupPosition",groupPosition);
+                        intent.putExtra("list",mAdapter.childList.get(groupPosition));
                         //Toast.makeText(FuLiCenterApplication.getInstance(), "groupName:"+groupName+"cat_id"+cat_id, Toast.LENGTH_SHORT).show();
                         MFGT.startActivity((MainActivity) context, CategoryListActivity.class,intent);
                     }
