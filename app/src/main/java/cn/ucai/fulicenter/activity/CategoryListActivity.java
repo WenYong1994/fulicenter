@@ -14,11 +14,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cn.ucai.fulicenter.R;
+import cn.ucai.fulicenter.application.FuLiCenterApplication;
 import cn.ucai.fulicenter.bean.NewGoodsBean;
+import cn.ucai.fulicenter.fragment.CategoryFragment;
 import cn.ucai.fulicenter.utils.I;
 import cn.ucai.fulicenter.utils.ImageLoader;
 import cn.ucai.fulicenter.utils.L;
@@ -62,6 +68,8 @@ public class CategoryListActivity extends AppCompatActivity {
     final int PULL_DOWN_ACTION=1;
     final int BENGIE_ACTION=2;
 
+    final int ORDER_KEY_PRIVICE=0;
+    final int ORDER_KEY_TIME=1;
 
 
     @Override
@@ -80,6 +88,25 @@ public class CategoryListActivity extends AppCompatActivity {
         setRecycler();
         setRefresh();
         setBoutiqueSencondBack();
+        setTitleCenter();
+        categoryListPriace.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+    }
+
+    private void setTitleCenter() {
+        categoryListTitleCenter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MFGT.finish(CategoryListActivity.this);
+                //先获取是谁展开了，在关闭它
+                //int whoExpand = getIntent().getIntExtra("groupPosition", -1);
+                //FuLiCenterApplication.categoryFragment.unExpand(whoExpand);
+            }
+        });
     }
 
     private void setBoutiqueSencondBack() {
@@ -149,7 +176,7 @@ public class CategoryListActivity extends AppCompatActivity {
     }
     private void downData(int page_id, final int action) {
         final OkHttpUtils<NewGoodsBean[]> utils = new OkHttpUtils<>(this);
-        utils.setRequestUrl(I.REQUEST_FIND_NEW_BOUTIQUE_GOODS)
+        utils.setRequestUrl(I.REQUEST_FIND_GOODS_DETAILS)
                 .addParam(I.GoodsDetails.KEY_CAT_ID,cat_id+"")
                 .addParam(I.PAGE_ID,page_id+"")
                 .addParam(I.PAGE_SIZE,PAGE_SIZE+"")
@@ -189,15 +216,6 @@ public class CategoryListActivity extends AppCompatActivity {
                 });
 
     }
-
-
-
-
-
-
-
-
-
 
 
     //这是商品的ViewHolder
@@ -251,6 +269,35 @@ public class CategoryListActivity extends AppCompatActivity {
         ViewGroup parent;
 
 
+        //下面定义排序方法
+        public void order(final boolean isAscending, final int orderKey){
+            Collections.sort(list, new Comparator<NewGoodsBean>() {
+                @Override
+                public int compare(NewGoodsBean lhs, NewGoodsBean rhs) {
+                    switch (orderKey){
+                        case ORDER_KEY_PRIVICE:
+                            if(isAscending){
+                                return privice2Int(lhs.getShopPrice())-privice2Int(rhs.getShopPrice());
+                            }
+                            return privice2Int(rhs.getShopPrice())-privice2Int(lhs.getShopPrice());
+                        case ORDER_KEY_TIME:
+                            if(isAscending){
+                                return (int) (lhs.getAddTime()-rhs.getAddTime());
+                            }
+                                return (int) (rhs.getAddTime()-lhs.getAddTime());
+                        default:
+                            try {
+                                throw new Exception("排序参数出错");
+                            } catch (Exception e) {
+                                L.e(e.getMessage());
+                            }
+                            break;
+                    }
+                    return 0;
+                }
+            });
+            notifyDataSetChanged();
+        }
 
         public boolean isMore() {
             return isMore;
@@ -279,12 +326,11 @@ public class CategoryListActivity extends AppCompatActivity {
                     int id = (int) v.getTag();
                     Intent intent = new Intent();
                     intent.putExtra("id",id);
-                    MFGT.startActivity((BoutiqueSecondActivity) context, GoodsDetailsActivity.class,intent);
+                    MFGT.startActivity((CategoryListActivity) context, GoodsDetailsActivity.class,intent);
                 }
             });
             return viewHolder;
         }
-
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
             //这里进行判断，如果是最后一个就代表是底部提醒信息
@@ -345,6 +391,17 @@ public class CategoryListActivity extends AppCompatActivity {
             //如果不是最后就代表显示商品信息
             return NEW_GOODS_TYPE;
         }
+    }
+
+    //创建一个方法利用正则表达式，将价格字符串转换为整形变量
+    public int privice2Int(String privice){
+        Pattern pattern = Pattern.compile("[0-9]");
+        Matcher matcher = pattern.matcher(privice);
+        String intPrivice="0";
+        if(matcher.find()){
+            intPrivice=privice.substring(privice.indexOf(matcher.group()));
+        }
+        return Integer.parseInt(intPrivice);
     }
 
     @Override

@@ -2,12 +2,17 @@ package cn.ucai.fulicenter.application;
 
 import android.app.Application;
 
+import cn.ucai.fulicenter.fragment.CategoryFragment;
+
 /**
  * Created by Administrator on 2016/10/17.
  */
 public class FuLiCenterApplication extends Application{
     private static  FuLiCenterApplication instance;
     public static FuLiCenterApplication application;
+    //下面东西有待考究，可能稳定性不高
+    //public static CategoryFragment categoryFragment;
+
 
     @Override
     public void onCreate() {

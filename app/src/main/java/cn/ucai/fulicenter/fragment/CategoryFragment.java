@@ -95,7 +95,7 @@ public class CategoryFragment extends BaseFragment {
                         mAdapter.page_idArr[whoExpand]++;
 //                        L.i("显示到最后一个了");
 //                        L.i("第几个被展开:"+(whoExpand+1));
-//                        L.i("第几页被加载"+mAdapter.page_idArr[whoExpand]);
+                        //L.i("第几页被加载"+mAdapter.page_idArr[whoExpand]);
                         CategoryGroupBean bean = mAdapter.getGroup(whoExpand);
                         downChildData(bean.getId(),mAdapter.page_idArr[whoExpand],whoExpand);
                     }
@@ -137,7 +137,7 @@ public class CategoryFragment extends BaseFragment {
 
     private void downChildData(int parent_id, int page_id, final int groupPosition){
         final OkHttpUtils<CategoryChildBean[]> utils = new OkHttpUtils<>(getContext());
-        utils.url(I.SERVER_ROOT+I.REQUEST_FIND_CATEGORY_CHILDREN)
+        utils.url(I.SERVER_ROOT+I.REQUEST_FIND_CATEGORY_CHILDREN+"Pages")
                 .addParam(I.CategoryChild.PARENT_ID,parent_id+"")
                 .addParam(I.PAGE_ID,page_id+"")
                 .addParam(I.PAGE_SIZE,PAGE_SIZE+"")
@@ -296,7 +296,7 @@ public class CategoryFragment extends BaseFragment {
             holder.cat_id=bean.getId();
             CategoryGroupBean beanGroup = groupList.get(groupPosition);
             holder.parentName = beanGroup.getName();
-
+            holder.groupPosistion=groupPosition;
 
             holder.categoryChildText.setText(bean.getName());
             Picasso.with(context)
@@ -322,7 +322,7 @@ public class CategoryFragment extends BaseFragment {
             TextView categoryChildText;
             String parentName;
             int cat_id ;
-
+            int groupPosistion;
 
             ChildViewHolder(View view) {
                 ButterKnife.bind(this, view);
@@ -331,10 +331,13 @@ public class CategoryFragment extends BaseFragment {
                     public void onClick(View v) {
                         ChildViewHolder holder = (ChildViewHolder) v.getTag();
                         String groupName = holder.parentName;
+                        int groupPosition=holder.groupPosistion;
+
                         int cat_id = holder.cat_id;
                         Intent intent = new Intent();
                         intent.putExtra("groupName",groupName);
                         intent.putExtra("cat_id",cat_id);
+                        intent.putExtra("groupPosition",groupPosition);
                         //Toast.makeText(FuLiCenterApplication.getInstance(), "groupName:"+groupName+"cat_id"+cat_id, Toast.LENGTH_SHORT).show();
                         MFGT.startActivity((MainActivity) context, CategoryListActivity.class,intent);
                     }
@@ -396,9 +399,34 @@ public class CategoryFragment extends BaseFragment {
             }
         }
     }
+
+    /*//在CategoryFragment里面定义一个方法关闭展开项
+    public void unExpand(int whoExpand){
+        if(whoExpand<0){
+            try {
+                throw new Exception("没有此项被打开");
+            } catch (Exception e) {
+                L.e(e.getMessage());
+            }
+            return;
+        }
+        categoryExpandableListView.collapseGroup(whoExpand);
+    }*/
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        for(int i=0;i<mAdapter.getGroupCount();i++){
+            categoryExpandableListView.collapseGroup(i);
+        }
+    }
+
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
     }
+
+
 }
