@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import cn.ucai.fulicenter.R;
 import cn.ucai.fulicenter.application.FuLiCenterApplication;
 import cn.ucai.fulicenter.bean.NewGoodsBean;
 import cn.ucai.fulicenter.fragment.CategoryFragment;
+import cn.ucai.fulicenter.utils.CommonUtils;
 import cn.ucai.fulicenter.utils.I;
 import cn.ucai.fulicenter.utils.ImageLoader;
 import cn.ucai.fulicenter.utils.L;
@@ -51,7 +53,11 @@ public class CategoryListActivity extends AppCompatActivity {
     RecyclerView categoryListRecycler;
     @Bind(R.id.category_list_swi)
     SwipeRefreshLayout mSwi;
-
+    @Bind(R.id.category_list_order_addtime)
+    RelativeLayout mOrderAddTime;
+    @Bind(R.id.category_list_order_privice)
+    RelativeLayout mOrderPrivice
+    ;
     GridLayoutManager mGridaLayoutManager;
     ArrayList<NewGoodsBean> list;
     GoodsAdpter mGoodsAdapter;
@@ -71,6 +77,9 @@ public class CategoryListActivity extends AppCompatActivity {
     final int ORDER_KEY_PRIVICE=0;
     final int ORDER_KEY_TIME=1;
 
+    //定义两个变量来保存现在是升序还是将序
+    boolean isAscendingPrivice=false,isAscendingAddTime=true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,10 +98,30 @@ public class CategoryListActivity extends AppCompatActivity {
         setRefresh();
         setBoutiqueSencondBack();
         setTitleCenter();
-        categoryListPriace.setOnClickListener(new View.OnClickListener() {
+        mOrderPrivice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                //现将图标给为升序
+                if(!isAscendingPrivice){
+                    categoryListPriace.setImageResource(R.drawable.arrow_order_up);
+                }else {
+                    categoryListPriace.setImageResource(R.drawable.arrow_order_down);
+                }
+                isAscendingPrivice=!isAscendingPrivice;
+                //在调用排序方法
+                mGoodsAdapter.order(!isAscendingPrivice,ORDER_KEY_PRIVICE);
+            }
+        });
+        mOrderAddTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!isAscendingAddTime){
+                    categoryListTime.setImageResource(R.drawable.arrow_order_up);
+                }else{
+                    categoryListTime.setImageResource(R.drawable.arrow_order_down);
+                }
+                isAscendingAddTime=!isAscendingAddTime;
+                mGoodsAdapter.order(!isAscendingAddTime,ORDER_KEY_TIME);
             }
         });
     }
@@ -271,15 +300,17 @@ public class CategoryListActivity extends AppCompatActivity {
 
         //下面定义排序方法
         public void order(final boolean isAscending, final int orderKey){
-            Collections.sort(list, new Comparator<NewGoodsBean>() {
+            Collections.sort(newGoodsBeenList, new Comparator<NewGoodsBean>() {
                 @Override
                 public int compare(NewGoodsBean lhs, NewGoodsBean rhs) {
                     switch (orderKey){
                         case ORDER_KEY_PRIVICE:
                             if(isAscending){
-                                return privice2Int(lhs.getShopPrice())-privice2Int(rhs.getShopPrice());
+                                L.i(privice2Int(lhs.getCurrencyPrice())-privice2Int(rhs.getCurrencyPrice())+"");
+                                return privice2Int(lhs.getCurrencyPrice())-privice2Int(rhs.getCurrencyPrice());
                             }
-                            return privice2Int(rhs.getShopPrice())-privice2Int(lhs.getShopPrice());
+                            L.i(privice2Int(rhs.getCurrencyPrice())-privice2Int(lhs.getCurrencyPrice())+"");
+                            return privice2Int(rhs.getCurrencyPrice())-privice2Int(lhs.getCurrencyPrice());
                         case ORDER_KEY_TIME:
                             if(isAscending){
                                 return (int) (lhs.getAddTime()-rhs.getAddTime());
@@ -348,7 +379,7 @@ public class CategoryListActivity extends AppCompatActivity {
             NewGoodsBean newGoodsBean = newGoodsBeenList.get(position);
             GoodsViewHolder newGoodsViewHolder = (GoodsViewHolder) holder;
             newGoodsViewHolder.newgoodsName.setText(newGoodsBean.getGoodsName());
-            newGoodsViewHolder.newgoodsPrice.setText(newGoodsBean.getShopPrice());
+            newGoodsViewHolder.newgoodsPrice.setText(newGoodsBean.getCurrencyPrice());
             //把商品的id通过itemView的tag传回去
             newGoodsViewHolder.itemView.setTag(newGoodsBean.getGoodsId());
             //下载图片

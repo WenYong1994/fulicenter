@@ -281,7 +281,7 @@ public class BoutiqueSecondActivity extends AppCompatActivity {
             NewGoodsBean newGoodsBean = newGoodsBeenList.get(position);
             GoodsViewHolder newGoodsViewHolder = (GoodsViewHolder) holder;
             newGoodsViewHolder.newgoodsName.setText(newGoodsBean.getGoodsName());
-            newGoodsViewHolder.newgoodsPrice.setText(newGoodsBean.getShopPrice());
+            newGoodsViewHolder.newgoodsPrice.setText(newGoodsBean.getCurrencyPrice());
             //把商品的id通过itemView的tag传回去
             newGoodsViewHolder.itemView.setTag(newGoodsBean.getGoodsId());
             //下载图片

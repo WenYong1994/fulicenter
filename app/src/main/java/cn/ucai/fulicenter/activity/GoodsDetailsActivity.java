@@ -173,6 +173,7 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
                             mgoodDetailEnglishName.setText(result.getGoodsEnglishName());
                             mgoodDetailName.setText(result.getGoodsName());
                             mgoodDetailTextDetail.setText(result.getGoodsBrief());
+                            mgoodDetailPrice.setText(result.getCurrencyPrice());
                             List<AlbumsBean> list = result.getProperties()[0].getAlbums();
                             mAlbumsBeanList=new ArrayList<AlbumsBean>(list);
                             mgoodDetaiUploadingLin.setVisibility(View.GONE);

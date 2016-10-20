@@ -44,6 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="45dp">
         <RelativeLayout
+            android:id="@+id/category_list_order_privice"
             android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
@@ -66,6 +67,7 @@
                 />
         </RelativeLayout>
         <RelativeLayout
+            android:id="@+id/category_list_order_addtime"
             android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
