@@ -1,9 +1,11 @@
 package cn.ucai.fulicenter.activity;
 
+import android.app.backup.SharedPreferencesBackupHelper;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -60,6 +62,12 @@ public class LoginActivity extends AppCompatActivity {
 
     private void initData() {
         mCommonTitle.setText("账号登录");
+        //通过首选项来获取上一次登录成功的账号
+        SharedPreferences sp = getSharedPreferences("fulicenter_userName",MODE_PRIVATE);
+        String userName =sp.getString("userName","");
+        if(userName!=null){
+            mLoginUserName.setText(userName);
+        }
     }
 
 
@@ -76,6 +84,9 @@ public class LoginActivity extends AppCompatActivity {
                             if(result.isRetMsg()){
                                 CommonUtils.showShortToast("登录成功");
                                 FuLiCenterApplication.setUserName(userName);
+                                //如果登录成功了，就把账号保存在首选项
+                                saveUserName(userName);
+                                finish();
                             }else {
                                 CommonUtils.showShortToast("账号密码有误，请检查后再登录");
                             }
@@ -97,6 +108,13 @@ public class LoginActivity extends AppCompatActivity {
                 MFGT.finish(this);
                 break;
         }
+    }
+
+    private void saveUserName(String userName) {
+        SharedPreferences sp = getSharedPreferences("fulicenter_userName",MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("userName",userName);
+        editor.commit();
     }
 
     private void register() {
