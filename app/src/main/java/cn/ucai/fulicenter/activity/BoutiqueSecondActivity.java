@@ -36,6 +36,7 @@ public class BoutiqueSecondActivity extends AppCompatActivity {
     SwipeRefreshLayout mSwi;
     @Bind(R.id.boutique_sencond_hint)
     TextView tvHint;
+    RecyclerView recyclerView;
 
     GridLayoutManager mGridaLayoutManager;
     ArrayList<NewGoodsBean> list;
@@ -331,7 +332,5 @@ public class BoutiqueSecondActivity extends AppCompatActivity {
         super.onBackPressed();
         MFGT.finish(this);
     }
-
-
 
 }

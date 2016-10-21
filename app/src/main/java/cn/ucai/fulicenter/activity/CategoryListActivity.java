@@ -103,6 +103,8 @@ public class CategoryListActivity extends AppCompatActivity {
         setOrderAddTime();
         String name = getIntent().getStringExtra("groupName");
         ArrayList<CategoryChildBean> list = (ArrayList<CategoryChildBean>) getIntent().getSerializableExtra("list");
+        //提前设置title的名字，而不是在点击事件的时候在设置
+        btnCatChildFilter.setTitle(name);
         btnCatChildFilter.setOnCatFilterClickListener(name,list);
     }
 

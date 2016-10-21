@@ -59,7 +59,7 @@ public class CatChildFilterButton extends Button {
         if(mgvCategory.getAdapter().getCount()<16){
             mPopupWindow.setHeight(LinearLayout.LayoutParams.WRAP_CONTENT);
         }else{
-            mPopupWindow.setHeight(ConvertUtils.px2dp(mContext, 200));
+           mPopupWindow.setHeight(ConvertUtils.px2dp(mContext, 500));
         }
         mPopupWindow.setTouchable(true);
         mPopupWindow.setOutsideTouchable(true);
@@ -149,9 +149,9 @@ public class CatChildFilterButton extends Button {
                         mPopupWindow.dismiss();
                     }
                     Intent intent=new Intent(mContext, CategoryListActivity.class);
-                    intent.putExtra(I.CategoryChild.CAT_ID, child.getId());
-                    intent.putExtra("childList", Children);
-                    intent.putExtra(I.CategoryGroup.NAME, mbtnTop.getText().toString());
+                    intent.putExtra("cat_id", child.getId());
+                    intent.putExtra("list", Children);
+                    intent.putExtra("groupName", mbtnTop.getText().toString());
                     mContext.startActivity(intent);
                     ((CategoryListActivity)mContext).finish();
                 }
@@ -176,8 +176,8 @@ public class CatChildFilterButton extends Button {
         mbtnTop.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                mbtnTop.setTextColor(Color.WHITE);
-                mbtnTop.setText(groupName);
+                //mbtnTop.setTextColor(Color.WHITE);
+                //mbtnTop.setText(groupName);
                 if(mExpandOff){//若分类列表的窗口未打开，则弹出窗口
                     mAdapter=new CatFilterAdapter(mContext, childList);
                     mgvCategory.setAdapter(mAdapter);
@@ -190,5 +190,9 @@ public class CatChildFilterButton extends Button {
                 setBtnTopArrow();
             }
         });
+    }
+    public void setTitle(String groupName){
+        mbtnTop.setText(groupName);
+        mbtnTop.setTextColor(Color.WHITE);
     }
 }

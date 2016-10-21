@@ -1,5 +1,6 @@
 package cn.ucai.fulicenter.activity;
 
+import android.content.Intent;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -70,6 +71,10 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.rb_id_persional_center:
                 mutual((RadioButton) v);
+                if(FuLiCenterApplication.getUserName()==null){
+                    Intent intent = new Intent(this,LoginActivity.class);
+                    MFGT.startActivity(this,intent);
+                }
                 break;
         }
     }
