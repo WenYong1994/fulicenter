@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import butterknife.Bind;
@@ -26,6 +27,8 @@ public class LoginActivity extends AppCompatActivity {
     Button mLoginBtnLogin;
     @Bind(R.id.mLogin_Btn_Register)
     Button mLoginBtnRegister;
+    @Bind(R.id.common_back)
+    ImageView commonBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +43,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    @OnClick({R.id.mLogin_Btn_Login, R.id.mLogin_Btn_Register})
+    @OnClick({R.id.mLogin_Btn_Login, R.id.mLogin_Btn_Register,R.id.common_back})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.mLogin_Btn_Login:
@@ -48,11 +51,16 @@ public class LoginActivity extends AppCompatActivity {
             case R.id.mLogin_Btn_Register:
                 register();
                 break;
+            case R.id.common_back:
+                MFGT.finish(this);
+                break;
         }
     }
 
     private void register() {
-        Intent intent = new Intent(this,RegisterActivity.class);
-        MFGT.startActivity(this,intent);
+        Intent intent = new Intent(this, RegisterActivity.class);
+        MFGT.startActivity(this, intent);
     }
+
+
 }
