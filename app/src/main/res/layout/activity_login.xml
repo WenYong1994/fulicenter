@@ -12,7 +12,7 @@
         android:layout_height="55dp">
         <EditText
             android:id="@+id/mLogin_UserName"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:hint="   用户名"
             android:background="#fff"
@@ -33,7 +33,7 @@
         android:layout_height="55dp">
         <EditText
             android:id="@+id/mLogin_PassWord"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:hint="  密码"
             android:inputType="textPassword"

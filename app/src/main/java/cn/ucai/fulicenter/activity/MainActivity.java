@@ -13,6 +13,7 @@ import cn.ucai.fulicenter.application.FuLiCenterApplication;
 import cn.ucai.fulicenter.fragment.BoutiqueFragment;
 import cn.ucai.fulicenter.fragment.CategoryFragment;
 import cn.ucai.fulicenter.fragment.NewGoodsFragment;
+import cn.ucai.fulicenter.utils.CommonUtils;
 import cn.ucai.fulicenter.utils.L;
 import cn.ucai.fulicenter.utils.MFGT;
 
@@ -74,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
                 if(FuLiCenterApplication.getUserName()==null){
                     Intent intent = new Intent(this,LoginActivity.class);
                     MFGT.startActivity(this,intent);
+                }else {
+                    CommonUtils.showShortToast("直接跳转到个人中心");
                 }
                 break;
         }

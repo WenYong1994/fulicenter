@@ -2,6 +2,7 @@ package cn.ucai.fulicenter.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -68,15 +69,21 @@ public class RegisterActivity extends AppCompatActivity {
 
     @OnClick(R.id.mRegister_Btn_Register)
     public void onClick() {
-        String userName = mRegisterUserName.getText().toString().trim();
+        registerUser();
+    }
+
+    private void registerUser() {
+        final String userName = mRegisterUserName.getText().toString().trim();
         String userNick = mRegisterUserNick.getText().toString().trim();
-        String passWord = mRegisterPassWrod.getText().toString().trim();
-        panduanNull();
+        final String passWord = mRegisterPassWrod.getText().toString().trim();
+        if(!panduanNull()){
+            return;
+        }
         OkHttpUtils<Result> utils = new OkHttpUtils<>(this);
-        //final ProgressDialog pd = new ProgressDialog(this);
-//        pd.setMessage("注册中。。。");
-//        pd.setCanceledOnTouchOutside(false);
-//        pd.show();
+        final ProgressDialog pd = new ProgressDialog(this);
+        pd.setMessage("注册中。。。");
+        pd.setCanceledOnTouchOutside(false);
+        pd.show();
 
         utils.url(I.SERVER_ROOT+I.REQUEST_REGISTER)
                 .addParam(I.User.USER_NAME,userName)
@@ -87,12 +94,16 @@ public class RegisterActivity extends AppCompatActivity {
                 .execute(new OkHttpUtils.OnCompleteListener<Result>() {
                     @Override
                     public void onSuccess(Result result) {
-                        //pd.dismiss();
+                        pd.dismiss();
                         if(result==null){
                             Toast.makeText(FuLiCenterApplication.getInstance(), "注册失败", Toast.LENGTH_SHORT).show();
                         }else {
                            if(result.isRetMsg()){
                                CommonUtils.showShortToast("注册成功");
+                               Intent intent = new Intent("cn.ucai.fulicenter_register_to_login");
+                               intent.putExtra("userName",userName);
+                               intent.putExtra("passWord",passWord);
+                               sendBroadcast(intent);
                                finish();
                            } else {
                                if (result.getRetCode()==I.MSG_REGISTER_USERNAME_EXISTS){
@@ -102,16 +113,15 @@ public class RegisterActivity extends AppCompatActivity {
                             }
                         }
                     }
-
                     @Override
                     public void onError(String error) {
-                        //pd.dismiss();
+                        pd.dismiss();
                         Toast.makeText(FuLiCenterApplication.getInstance(), "由于网络原因注册失败", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-    private void panduanNull() {
+    private boolean panduanNull() {
         String userName = mRegisterUserName.getText().toString().trim();
         String userNick = mRegisterUserNick.getText().toString().trim();
         String passWord = mRegisterPassWrod.getText().toString().trim();
@@ -119,34 +129,37 @@ public class RegisterActivity extends AppCompatActivity {
         if (userName == null || userName.equals("")) {
             mRegisterUserName.setError(mArrErrMsg[0]);
             mRegisterUserName.requestFocus();
-            return;
+            return false;
         }
         if (userNick == null || userNick.equals("")) {
             mRegisterUserNick.setError(mArrErrMsg[1]);
             mRegisterUserNick.requestFocus();
-            return;
+            return false;
         }
         if (passWord == null || passWord.equals("")) {
             mRegisterPassWrod.setError(mArrErrMsg[2]);
             mRegisterPassWrod.requestFocus();
-            return;
+            return false;
         }
 
         if (okPassWord == null || okPassWord.equals("")) {
             mRegisterOkPassWrod.setError(mArrErrMsg[3]);
             mRegisterOkPassWrod.requestFocus();
-            return;
+            return false;
         }
 
         if (!userName.matches("[a-zA-Z]\\w{5,15}")) {
             mRegisterUserName.setError("非法账号，5-15个字符，并且使用字母开头");
             mRegisterUserName.requestFocus();
+            return false;
         }
 
         if(!okPassWord.equals(passWord)){
             mRegisterOkPassWrod.setError("两次密码必须相同");
             mRegisterOkPassWrod.requestFocus();
+            return false;
         }
+        return true;
     }
 
 
