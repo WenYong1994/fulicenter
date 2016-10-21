@@ -46,6 +46,8 @@ public class Result {
         this.retData = retData;
     }
 
+
+
     public static class RetDataBean {
         private String muserName;
         private String muserNick;

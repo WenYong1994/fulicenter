@@ -1,19 +1,28 @@
 package cn.ucai.fulicenter.activity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.ucai.fulicenter.R;
+import cn.ucai.fulicenter.application.FuLiCenterApplication;
+import cn.ucai.fulicenter.bean.Result;
+import cn.ucai.fulicenter.utils.CommonUtils;
+import cn.ucai.fulicenter.utils.I;
+import cn.ucai.fulicenter.utils.MD5;
 import cn.ucai.fulicenter.utils.MFGT;
+import cn.ucai.fulicenter.utils.OkHttpUtils;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -62,8 +71,51 @@ public class RegisterActivity extends AppCompatActivity {
         String userName = mRegisterUserName.getText().toString().trim();
         String userNick = mRegisterUserNick.getText().toString().trim();
         String passWord = mRegisterPassWrod.getText().toString().trim();
-        String okPassWord = mRegisterOkPassWrod.getText().toString().trim();
+        panduanNull();
+        OkHttpUtils<Result> utils = new OkHttpUtils<>(this);
+        //final ProgressDialog pd = new ProgressDialog(this);
+//        pd.setMessage("注册中。。。");
+//        pd.setCanceledOnTouchOutside(false);
+//        pd.show();
 
+        utils.url(I.SERVER_ROOT+I.REQUEST_REGISTER)
+                .addParam(I.User.USER_NAME,userName)
+                .addParam(I.User.NICK,userNick)
+                .addParam(I.User.PASSWORD, MD5.getMessageDigest(passWord))
+                .targetClass(Result.class)
+                .post()
+                .execute(new OkHttpUtils.OnCompleteListener<Result>() {
+                    @Override
+                    public void onSuccess(Result result) {
+                        //pd.dismiss();
+                        if(result==null){
+                            Toast.makeText(FuLiCenterApplication.getInstance(), "注册失败", Toast.LENGTH_SHORT).show();
+                        }else {
+                           if(result.isRetMsg()){
+                               CommonUtils.showShortToast("注册成功");
+                               finish();
+                           } else {
+                               if (result.getRetCode()==I.MSG_REGISTER_USERNAME_EXISTS){
+                                   CommonUtils.showShortToast("账号已存在");
+                               }
+                               CommonUtils.showShortToast("注册失败");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        //pd.dismiss();
+                        Toast.makeText(FuLiCenterApplication.getInstance(), "由于网络原因注册失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void panduanNull() {
+        String userName = mRegisterUserName.getText().toString().trim();
+        String userNick = mRegisterUserNick.getText().toString().trim();
+        String passWord = mRegisterPassWrod.getText().toString().trim();
+        String okPassWord = mRegisterOkPassWrod.getText().toString().trim();
         if (userName == null || userName.equals("")) {
             mRegisterUserName.setError(mArrErrMsg[0]);
             mRegisterUserName.requestFocus();
@@ -86,11 +138,15 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        if (!userName.matches("[0-9a-zA-Z_]{6,15}")) {
-            mRegisterUserName.setError("账号只能有字母数字下滑线，长度只能是6-15");
+        if (!userName.matches("[a-zA-Z]\\w{5,15}")) {
+            mRegisterUserName.setError("非法账号，5-15个字符，并且使用字母开头");
             mRegisterUserName.requestFocus();
         }
 
+        if(!okPassWord.equals(passWord)){
+            mRegisterOkPassWrod.setError("两次密码必须相同");
+            mRegisterOkPassWrod.requestFocus();
+        }
     }
 
 

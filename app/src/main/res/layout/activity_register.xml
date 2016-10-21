@@ -83,6 +83,7 @@
             android:layout_height="match_parent"
             android:hint="   确认密码"
             android:background="#fff"
+            android:inputType="textPassword"
             />
         <ImageView
             android:layout_centerVertical="true"
