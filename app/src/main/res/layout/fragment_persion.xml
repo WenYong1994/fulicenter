@@ -16,7 +16,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/message"
+                android:src="@drawable/tb_icon_more_msg_white_56"
                 android:id="@+id/m_Persion_Message"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="10dp"
@@ -31,7 +31,7 @@
                 android:textColor="#fff"
                 android:layout_marginTop="10dp"
                 android:layout_toLeftOf="@id/m_Persion_Message"
-                android:layout_marginRight="25dp"
+                android:layout_marginRight="20dp"
                 />
         </RelativeLayout>
         <LinearLayout
@@ -71,6 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="70dp">
             <LinearLayout
+                android:id="@+id/m_Persion_m_Persion_Collect_Treasure_Lin"
                 android:gravity="center_horizontal"
                 android:layout_weight="1"
                 android:orientation="vertical"

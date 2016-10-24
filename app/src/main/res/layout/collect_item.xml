@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="220dp"
+    android:layout_height="250dp"
+    android:background="#c1bfbf">
+    <RelativeLayout
+        android:layout_gravity="center_horizontal"
+        android:background="#fff"
+        android:layout_width="230dp"
+        android:gravity="center_horizontal"
+        android:layout_height="260dp">
+        <ImageView
+            android:src="@drawable/nopic"
+            android:layout_width="220dp"
+            android:layout_height="270dp"
+            android:id="@+id/m_Goods_Iv"
+            android:scaleType="fitXY"
+            />
+        <ImageView
+            android:id="@+id/m_Good_Detele_Collect"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/delete"
+            android:layout_marginRight="5dp"
+            />
+    </RelativeLayout>
+    <TextView
+        android:layout_marginLeft="23dp"
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="双层分格饭"
+        android:id="@+id/m_Goods_Name"
+        />
+</LinearLayout>

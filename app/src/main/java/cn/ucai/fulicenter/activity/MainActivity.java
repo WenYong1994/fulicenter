@@ -115,11 +115,14 @@ public class MainActivity extends AppCompatActivity {
                 if(ftPersion==null){
                     ftPersion = getSupportFragmentManager().beginTransaction();
                 }
+                mRabtn_Personal_Center.setChecked(true);
+                mutual(mRabtn_Personal_Center);
                 PersionFragment persionFragmeng = new PersionFragment();
                 ftPersion.replace(R.id.newgoods_fragment_one,persionFragmeng);
                 ftPersion.commit();
                 ftPersion=null;
                 isLoginSuccess=true;
+
             }
         }
     }
