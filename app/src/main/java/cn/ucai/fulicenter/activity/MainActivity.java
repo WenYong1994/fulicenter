@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.rb_id_persional_center:
                 mutual((RadioButton) v);
-                if(FuLiCenterApplication.getUserName()==null){
+                if(FuLiCenterApplication.getInstance().getUserName()==null){
                     Intent intent = new Intent(this,LoginActivity.class);
                     MFGT.startActivity(this,intent);
                 }else {

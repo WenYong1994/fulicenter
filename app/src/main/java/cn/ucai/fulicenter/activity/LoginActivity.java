@@ -83,7 +83,7 @@ public class LoginActivity extends AppCompatActivity {
                         if(result!=null){
                             if(result.isRetMsg()){
                                 CommonUtils.showShortToast("登录成功");
-                                FuLiCenterApplication.setUserName(userName);
+                                FuLiCenterApplication.getInstance().setUserName(userName);
                                 //如果登录成功了，就把账号保存在首选项
                                 saveUserName(userName);
                                 finish();

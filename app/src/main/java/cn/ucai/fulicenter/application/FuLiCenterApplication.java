@@ -12,13 +12,13 @@ public class FuLiCenterApplication extends Application{
     public static FuLiCenterApplication application;
     //下面东西有待考究，可能稳定性不高
     //public static CategoryFragment categoryFragment;
-    private static String userName;
+    private String userName;
 
-    public static String getUserName() {
+    public  String getUserName() {
         return userName;
     }
 
-    public static void setUserName(String username) {
+    public  void setUserName(String username) {
         userName = username;
     }
 
