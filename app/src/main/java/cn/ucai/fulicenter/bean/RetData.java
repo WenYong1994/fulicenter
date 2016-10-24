@@ -1,9 +1,10 @@
 package cn.ucai.fulicenter.bean;
 
 /**
- * Created by Administrator on 2016/10/24.
+ * Created by Administrator on 2016/10/13.
  */
-public class UserAvatar  {
+public class RetData {
+
     /**
      * muserName : a952702
      * muserNick : 彭鹏
@@ -80,14 +81,14 @@ public class UserAvatar  {
 
     @Override
     public String toString() {
-        return "UserAvatar{" +
-                "muserName='" + muserName + '\'' +
-                ", muserNick='" + muserNick + '\'' +
-                ", mavatarId=" + mavatarId +
-                ", mavatarPath='" + mavatarPath + '\'' +
-                ", mavatarSuffix='" + mavatarSuffix + '\'' +
-                ", mavatarType=" + mavatarType +
-                ", mavatarLastUpdateTime=" + mavatarLastUpdateTime +
+        return "{" +
+                "muserName:'" + muserName + '\'' +
+                ", muserNick:'" + muserNick + '\'' +
+                ", mavatarId:" + mavatarId +
+                ", mavatarPath:'" + mavatarPath + '\'' +
+                ", mavatarSuffix:'" + mavatarSuffix + '\'' +
+                ", mavatarType:" + mavatarType +
+                ", mavatarLastUpdateTime:" + mavatarLastUpdateTime +
                 '}';
     }
 }

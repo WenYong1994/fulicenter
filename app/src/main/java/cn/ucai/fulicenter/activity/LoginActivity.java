@@ -1,5 +1,6 @@
 package cn.ucai.fulicenter.activity;
 
+import android.app.Application;
 import android.app.backup.SharedPreferencesBackupHelper;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,12 +16,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.ucai.fulicenter.R;
 import cn.ucai.fulicenter.application.FuLiCenterApplication;
 import cn.ucai.fulicenter.bean.Result;
+import cn.ucai.fulicenter.bean.RetData;
+import cn.ucai.fulicenter.bean.UserAvatar;
+import cn.ucai.fulicenter.mydb.DBDao;
 import cn.ucai.fulicenter.utils.CommonUtils;
 import cn.ucai.fulicenter.utils.L;
 import cn.ucai.fulicenter.utils.MFGT;
@@ -86,6 +92,13 @@ public class LoginActivity extends AppCompatActivity {
                                 FuLiCenterApplication.getInstance().setUserName(userName);
                                 //如果登录成功了，就把账号保存在首选项
                                 saveUserName(userName);
+                                //这个是把对象保存在Application和Application里面
+                                L.e(result.getRetData().toString());
+                                String str= result.getRetData().toString();
+                                Gson gson = new Gson();
+                                UserAvatar userAvatar = gson.fromJson(str, UserAvatar.class);
+                                new DBDao(FuLiCenterApplication.getInstance()).savaUser(userAvatar);
+                                FuLiCenterApplication.getInstance().setUserAvatar(userAvatar);
                                 finish();
                             }else {
                                 CommonUtils.showShortToast("账号密码有误，请检查后再登录");

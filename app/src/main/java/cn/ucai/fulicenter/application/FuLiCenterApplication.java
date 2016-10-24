@@ -2,6 +2,7 @@ package cn.ucai.fulicenter.application;
 
 import android.app.Application;
 
+import cn.ucai.fulicenter.bean.UserAvatar;
 import cn.ucai.fulicenter.fragment.CategoryFragment;
 
 /**
@@ -12,7 +13,17 @@ public class FuLiCenterApplication extends Application{
     public static FuLiCenterApplication application;
     //下面东西有待考究，可能稳定性不高
     //public static CategoryFragment categoryFragment;
+
     private String userName;
+    private UserAvatar userAvatar;
+
+    public UserAvatar getUserAvatar() {
+        return userAvatar;
+    }
+
+    public void setUserAvatar(UserAvatar userAvatar) {
+        this.userAvatar = userAvatar;
+    }
 
     public  String getUserName() {
         return userName;
