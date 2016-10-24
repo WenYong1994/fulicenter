@@ -80,7 +80,7 @@ public class CollectActivity extends AppCompatActivity {
                 super.onScrollStateChanged(recyclerView, newState);
                 int lastPosition = manager.findLastVisibleItemPosition();
 
-                if (lastPosition >= adapter.getItemCount() - 1 && newState == RecyclerView.SCROLL_STATE_IDLE
+                if (lastPosition >= adapter.getItemCount()-1 && newState == RecyclerView.SCROLL_STATE_IDLE
                         && adapter.isMore()) {
                     Page_id++;
                     initData(Page_id, PULL_UP);
@@ -115,7 +115,7 @@ public class CollectActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(CollectBean[] result) {
                         if (result != null && result.length != 0) {
-                            L.e(Arrays.toString(result));
+                            adapter.setMore(true);
                             ArrayList<CollectBean> list = utils.array2List(result);
                             switch (actiong) {
                                 case PULL_DOWN_OR_INIT:
@@ -229,7 +229,7 @@ public class CollectActivity extends AppCompatActivity {
             holder.mGoodDeteleCollect.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int position = (int) v.getTag();
+                    final int position = (int) v.getTag();
                     final CollectBean bean = list.get(position);
                     new OkHttpUtils<MessageBean>(context)
                             .url(I.SERVER_ROOT+I.REQUEST_DELETE_COLLECT)
@@ -240,7 +240,7 @@ public class CollectActivity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(MessageBean result) {
                                     if(result.isSuccess()){
-                                        list.remove(bean);
+                                        list.remove(position);
                                         notifyDataSetChanged();
                                     }else {
                                         CommonUtils.showShortToast("删除收藏失败");
