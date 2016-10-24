@@ -1,6 +1,7 @@
 package cn.ucai.fulicenter.activity;
 
 import android.app.Application;
+import android.app.ProgressDialog;
 import android.app.backup.SharedPreferencesBackupHelper;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -81,29 +83,35 @@ public class LoginActivity extends AppCompatActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.mLogin_Btn_Login:
+                final ProgressDialog pb = new ProgressDialog(LoginActivity.this);
+                pb.setMessage("登录中");
+                pb.show();
                 final String userName = mLoginUserName.getText().toString().trim();
                 String passWord = mLoginPassWord.getText().toString().trim();
                 UtilsDao.login(this, userName, passWord, new OkHttpUtils.OnCompleteListener<Result>() {
                     @Override
                     public void onSuccess(Result result) {
                         if(result!=null){
+                            pb.dismiss();
                             if(result.isRetMsg()){
                                 CommonUtils.showShortToast("登录成功");
                                 FuLiCenterApplication.getInstance().setUserName(userName);
                                 //如果登录成功了，就把账号保存在首选项
                                 saveUserName(userName);
                                 //这个是把对象保存在Application和Application里面
-                                L.e(result.getRetData().toString());
                                 String str= result.getRetData().toString();
                                 Gson gson = new Gson();
                                 UserAvatar userAvatar = gson.fromJson(str, UserAvatar.class);
                                 new DBDao(FuLiCenterApplication.getInstance()).savaUser(userAvatar);
                                 FuLiCenterApplication.getInstance().setUserAvatar(userAvatar);
+                                Intent intent = new Intent();
+                                setResult(1,intent);
                                 finish();
                             }else {
                                 CommonUtils.showShortToast("账号密码有误，请检查后再登录");
                             }
                         }else {
+                            pb.dismiss();
                             CommonUtils.showShortToast("登录失败");
                         }
                     }

@@ -37,14 +37,12 @@ public class MyDBHelper extends SQLiteOpenHelper {
 
     private MyDBHelper(Context context) {
         super(context,getUserDatabaseName(), null, 1);
-        L.e(TAG+"进入数据库的构造方法");
         SQLiteDatabase db = getWritableDatabase();
 
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        L.e(TAG+"进入onCreate");
         db.execSQL(FULICENTENR_USER_TABLE_CREATE);
     }
 

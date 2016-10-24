@@ -42,12 +42,10 @@ public class SplashAvitivty extends AppCompatActivity {
                 SharedPreferences sp = getSharedPreferences("fulicenter_userName",MODE_PRIVATE);
                 String userName = sp.getString("userName",null);
                 if(userName!=null){
-                    L.i(TAG+"进入闪屏");
                     UserAvatar user = new DBDao(FuLiCenterApplication.getInstance()).getUser(userName);
                     //再将数据存到FuliCenterAppllcation中
                     FuLiCenterApplication.getInstance().setUserAvatar(user);
                     FuLiCenterApplication.getInstance().setUserName(user.getMuserName());
-                    L.i(TAG+user.toString());
                 }
                 MFGT.gotoMainActivity(SplashAvitivty.this);
                 finish();

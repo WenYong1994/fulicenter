@@ -24,7 +24,6 @@ public class MyDBManager {
 
     public MyDBHelper onInit(Context context){
         if(mHelper==null){
-            L.i(TAG+"进入onInit");
             mHelper=MyDBHelper.getInstance(context);
         }
         return mHelper;

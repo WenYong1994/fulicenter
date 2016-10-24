@@ -23,7 +23,6 @@ public class DBDao {
 
     public DBDao(Context context){
         //实例化数据库
-        L.i(TAG+"进入dao成");
         MyDBManager.getInstance().onInit(context);
     }
 
