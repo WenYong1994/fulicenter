@@ -44,9 +44,11 @@
             android:layout_height="wrap_content">
             <ImageView
                 android:id="@+id/m_Persion_UserAvatar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:src="@drawable/user_avatar"
+                android:layout_marginLeft="10dp"
+                android:scaleType="fitXY"
                 />
             <TextView
                 android:id="@+id/m_Persion_UserNick"
@@ -67,7 +69,7 @@
             android:gravity="center_vertical"
             android:background="#ff3c00"
             android:layout_width="match_parent"
-            android:layout_height="60dp">
+            android:layout_height="70dp">
             <LinearLayout
                 android:gravity="center_horizontal"
                 android:layout_weight="1"
@@ -76,7 +78,7 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/m_Persion_Collect_Treasure"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="6dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#fff"
@@ -104,7 +106,7 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/m_Persion_Collect_Shop"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="6dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#fff"
@@ -132,7 +134,7 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/m_Persion_Footprint"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="6dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#fff"
@@ -154,6 +156,7 @@
             android:layout_width="match_parent"
             android:layout_height="70dp">
             <TextView
+                android:layout_marginLeft="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="我的订单"
@@ -237,6 +240,7 @@
                 android:gravity="center_vertical"
                 >
                 <TextView
+                    android:layout_marginLeft="10dp"
                     android:layout_centerVertical="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -266,6 +270,7 @@
                 android:gravity="center_vertical"
                 >
                 <ImageView
+                    android:layout_marginLeft="10dp"
                     android:id="@+id/m_Persion_My_All_Card_Iv"
                     android:layout_centerVertical="true"
                     android:layout_width="wrap_content"
@@ -304,6 +309,7 @@
                 android:gravity="center_vertical"
                 >
                 <ImageView
+                    android:layout_marginLeft="10dp"
                     android:id="@+id/m_Persion_My_Online_Shop_IV"
                     android:layout_centerVertical="true"
                     android:layout_width="wrap_content"
@@ -350,6 +356,7 @@
                 android:gravity="center_vertical"
                 >
                 <ImageView
+                    android:layout_marginLeft="10dp"
                     android:id="@+id/m_Persion_My_Member_Card_IV"
                     android:layout_centerVertical="true"
                     android:layout_width="wrap_content"

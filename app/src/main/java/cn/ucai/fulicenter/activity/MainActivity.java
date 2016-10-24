@@ -23,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
             mRabtn_Category,mRabtn_Cars,mRabtn_Personal_Center;
 
     FragmentTransaction ftPersion,ftNewgoods,ftBoutique,ftCategory;
+    //设置一个变量来判断是否登录成功
+    boolean isLoginSuccess=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +88,11 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(this,LoginActivity.class);
                     startActivityForResult(intent,1);
                     overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+                    if(isLoginSuccess){
+                        mutual((RadioButton) v);
+                    }else {
+                        ((RadioButton) v).setChecked(false);
+                    }
                 }else {
                     if(ftPersion==null){
                         ftPersion = getSupportFragmentManager().beginTransaction();
@@ -94,8 +101,8 @@ public class MainActivity extends AppCompatActivity {
                     ftPersion.replace(R.id.newgoods_fragment_one,persionFragmeng);
                     ftPersion.commit();
                     ftPersion=null;
+                    mutual((RadioButton) v);
                 }
-                mutual((RadioButton) v);
                 break;
         }
     }
@@ -112,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
                 ftPersion.replace(R.id.newgoods_fragment_one,persionFragmeng);
                 ftPersion.commit();
                 ftPersion=null;
+                isLoginSuccess=true;
             }
         }
     }

@@ -32,8 +32,11 @@ import butterknife.ButterKnife;
 import cn.sharesdk.framework.ShareSDK;
 import cn.sharesdk.onekeyshare.OnekeyShare;
 import cn.ucai.fulicenter.R;
+import cn.ucai.fulicenter.application.FuLiCenterApplication;
 import cn.ucai.fulicenter.bean.AlbumsBean;
 import cn.ucai.fulicenter.bean.GoodsDetailsBean;
+import cn.ucai.fulicenter.bean.MessageBean;
+import cn.ucai.fulicenter.bean.UserAvatar;
 import cn.ucai.fulicenter.utils.CommonUtils;
 import cn.ucai.fulicenter.utils.I;
 import cn.ucai.fulicenter.utils.ImageLoader;
@@ -78,6 +81,11 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
     ArrayList<ImageView> mImagerViewList;
 
 
+    //定义一个变量来保存商品是否被收藏
+    boolean isCollect=false;
+    int id;
+    UserAvatar user;
+
     boolean isRun=false;
     int mFocus=-1;
     Handler mHandler;
@@ -94,6 +102,37 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
         setListener();
         initHandler();
         setOnTouch();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //这里获取是否被收藏
+        user = FuLiCenterApplication.getInstance().getUserAvatar();
+        if(user!=null){
+            new  OkHttpUtils<MessageBean>(this)
+                    .url(I.SERVER_ROOT+I.REQUEST_IS_COLLECT)
+                    .addParam(I.Goods.KEY_GOODS_ID,id+"")
+                    .addParam(I.Collect.USER_NAME,user.getMuserName())
+                    .targetClass(MessageBean.class)
+                    .execute(new OkHttpUtils.OnCompleteListener<MessageBean>() {
+                        @Override
+                        public void onSuccess(MessageBean result) {
+                            if(result.isSuccess()){
+                                mgoodDetailTitleCollect.setImageResource(R.mipmap.bg_collect_out);
+                                isCollect=true;
+                            }else {
+                                isCollect=false;
+                            }
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            CommonUtils.showShortToast("获取收藏信息失败");
+                        }
+                    });
+        }
+
     }
 
     private void setOnTouch() {
@@ -136,6 +175,65 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
     private void setListener() {
         setMGoodDetailTitleBackListener();
         setMGoodsDetailTitleShareListener();
+        setMGoodsDetatileColoect();
+    }
+
+    private void setMGoodsDetatileColoect() {
+        mgoodDetailTitleCollect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(user==null){
+                    return;
+                }
+                if(isCollect){
+                    //这就是取消收藏
+                    new OkHttpUtils<MessageBean>(GoodsDetailsActivity.this)
+                            .url(I.SERVER_ROOT+I.REQUEST_DELETE_COLLECT)
+                            .addParam(I.Goods.KEY_GOODS_ID,id+"")
+                            .addParam(I.Collect.USER_NAME,user.getMuserName())
+                            .targetClass(MessageBean.class)
+                            .execute(new OkHttpUtils.OnCompleteListener<MessageBean>() {
+                                @Override
+                                public void onSuccess(MessageBean result) {
+                                    if(result.isSuccess()){
+                                        mgoodDetailTitleCollect.setImageResource(R.mipmap.bg_collect_in);
+                                        isCollect=false;
+                                    }else {
+                                        CommonUtils.showShortToast("取消收藏失败");
+                                    }
+                                }
+
+                                @Override
+                                public void onError(String error) {
+                                    CommonUtils.showShortToast("取消收藏失败");
+                                }
+                            });
+                }else {
+                    //这就是添加收藏
+                    new OkHttpUtils<MessageBean>(GoodsDetailsActivity.this)
+                            .url(I.SERVER_ROOT+I.REQUEST_ADD_COLLECT)
+                            .addParam(I.Goods.KEY_GOODS_ID,id+"")
+                            .addParam(I.Collect.USER_NAME,user.getMuserName())
+                            .targetClass(MessageBean.class)
+                            .execute(new OkHttpUtils.OnCompleteListener<MessageBean>() {
+                                @Override
+                                public void onSuccess(MessageBean result) {
+                                    if(result.isSuccess()){
+                                        mgoodDetailTitleCollect.setImageResource(R.mipmap.bg_collect_out);
+                                        isCollect=true;
+                                    }else {
+                                        CommonUtils.showShortToast("添加收藏失败");
+                                    }
+                                }
+
+                                @Override
+                                public void onError(String error) {
+                                    CommonUtils.showShortToast("添加收藏失败");
+                                }
+                            });
+                }
+            }
+        });
     }
 
     private void setMGoodsDetailTitleShareListener() {
@@ -161,7 +259,7 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
 
     private void initData() {
         Intent intent = getIntent();
-        final int id = intent.getIntExtra("id",-1);
+        id = intent.getIntExtra("id",-1);
         new OkHttpUtils<GoodsDetailsBean>(this)
                 .url(I.SERVER_ROOT+I.REQUEST_FIND_GOOD_DETAILS)
                 .addParam(I.Goods.KEY_GOODS_ID,id+"")
