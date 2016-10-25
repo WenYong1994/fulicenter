@@ -1,6 +1,7 @@
 package cn.ucai.fulicenter.activity;
 
 import android.content.Intent;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,6 +27,9 @@ public class MainActivity extends AppCompatActivity {
     //设置一个变量来判断是否登录成功
     boolean isLoginSuccess=false;
 
+    RadioButton mLastCheckNoPersion;
+    Fragment mLastShowNoPersion;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void initView() {
         mRabtn_NewGoods = (RadioButton) findViewById(R.id.rb_id_newgoods);
+        mLastCheckNoPersion=mRabtn_NewGoods;
+        mLastShowNoPersion=new NewGoodsFragment();
         mRabtn_Boutique = (RadioButton) findViewById(R.id.rb_id_boutique);
         mRabtn_Category = (RadioButton) findViewById(R.id.rb_id_category);
         mRabtn_Cars = (RadioButton) findViewById(R.id.rb_id_cars);
@@ -54,9 +60,11 @@ public class MainActivity extends AppCompatActivity {
                     ftNewgoods = getSupportFragmentManager().beginTransaction();
                 }
                 NewGoodsFragment newGoodsFragment = new NewGoodsFragment();
+                mLastShowNoPersion=newGoodsFragment;
                 ftNewgoods.replace(R.id.newgoods_fragment_one,newGoodsFragment);
                 ftNewgoods.commit();
                 ftNewgoods=null;
+                mLastCheckNoPersion= (RadioButton) v;
                 break;
             case R.id.rb_id_boutique:
                 mutual((RadioButton) v);
@@ -64,24 +72,32 @@ public class MainActivity extends AppCompatActivity {
                     ftBoutique = getSupportFragmentManager().beginTransaction();
                 }
                 BoutiqueFragment boutiqueFragment = new BoutiqueFragment();
+                mLastShowNoPersion=boutiqueFragment;
                 ftBoutique.replace(R.id.newgoods_fragment_one,boutiqueFragment);
                 ftBoutique.commit();
                 ftBoutique=null;
+                mLastCheckNoPersion= (RadioButton) v;
                 break;
             case R.id.rb_id_category:
                 if(ftCategory==null){
                     ftCategory = getSupportFragmentManager().beginTransaction();
                 }
                 CategoryFragment fragment = new CategoryFragment();
+                mLastShowNoPersion=fragment;
                 ftCategory.replace(R.id.newgoods_fragment_one,fragment);
                 //将这个CategoryFragment全局化
                 //FuLiCenterApplication.categoryFragment=fragment;
                 ftCategory.commit();
                 ftCategory=null;
                 mutual((RadioButton) v);
+                mLastCheckNoPersion= (RadioButton) v;
                 break;
             case R.id.rb_id_cars:
                 mutual((RadioButton) v);
+
+
+
+
                 break;
             case R.id.rb_id_persional_center:
                 if(FuLiCenterApplication.getInstance().getUserName()==null){
@@ -108,6 +124,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        //这就让回来的时候回到新品fragment
+        if(FuLiCenterApplication.getInstance().getUserName()==null){
+            mLastCheckNoPersion.setChecked(true);
+            mutual(mLastCheckNoPersion);
+            FragmentTransaction ftNewgoods1 = getSupportFragmentManager().beginTransaction();
+            NewGoodsFragment newGoodsFragment = new NewGoodsFragment();
+            ftNewgoods1.replace(R.id.newgoods_fragment_one,mLastShowNoPersion);
+            ftNewgoods1.commitAllowingStateLoss();
+            ftNewgoods1=null;
+        }
+    }
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==1){
@@ -122,11 +152,9 @@ public class MainActivity extends AppCompatActivity {
                 ftPersion.commit();
                 ftPersion=null;
                 isLoginSuccess=true;
-
             }
         }
     }
-
     private void mutual(RadioButton rabtn){
         if(rabtn!=mRabtn_Boutique){
             mRabtn_Boutique.setChecked(false);

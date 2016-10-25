@@ -100,10 +100,6 @@ public class RegisterActivity extends AppCompatActivity {
                         }else {
                            if(result.isRetMsg()){
                                CommonUtils.showShortToast("注册成功");
-                               Intent intent = new Intent("cn.ucai.fulicenter_register_to_login");
-                               intent.putExtra("userName",userName);
-                               intent.putExtra("passWord",passWord);
-                               sendBroadcast(intent);
                                finish();
                            } else {
                                if (result.getRetCode()==I.MSG_REGISTER_USERNAME_EXISTS){

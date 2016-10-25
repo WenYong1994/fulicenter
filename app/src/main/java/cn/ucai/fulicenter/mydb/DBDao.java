@@ -38,8 +38,13 @@ public class DBDao {
         return MyDBManager.getInstance().getUser(username);
     }
 
-    public boolean deleteUser(UserAvatar userAvatar){
+    public boolean updataUser(UserAvatar userAvatar){
         return MyDBManager.getInstance().updateUser(userAvatar);
     }
+
+    public boolean deleteUser(String userName){
+        return MyDBManager.getInstance().deleteUser(userName);
+    }
+
 
 }

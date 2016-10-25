@@ -91,4 +91,10 @@ public class MyDBManager {
         return true;
     }
 
+    public boolean deleteUser(String userName){
+        SQLiteDatabase db= mHelper.getWritableDatabase();
+        int i = db.delete(DBDao.USER_TABLE_NAME, DBDao.USER_NAME + "=?", new String[]{userName});
+        return  i>0;
+    }
+
 }

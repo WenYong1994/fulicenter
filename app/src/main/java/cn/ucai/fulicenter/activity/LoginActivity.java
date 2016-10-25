@@ -59,14 +59,6 @@ public class LoginActivity extends AppCompatActivity {
         initData();
     }
 
-    @Override
-    protected void onStart() {
-        MyReceiver my = new MyReceiver();
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("cn.ucai.fulicenter_register_to_login");
-        registerReceiver(my,filter);
-        super.onStart();
-    }
 
     private void initData() {
         mCommonTitle.setText("账号登录");
@@ -88,6 +80,7 @@ public class LoginActivity extends AppCompatActivity {
                 pb.show();
                 final String userName = mLoginUserName.getText().toString().trim();
                 String passWord = mLoginPassWord.getText().toString().trim();
+                FuLiCenterApplication.getInstance().setPassWord(passWord);
                 UtilsDao.login(this, userName, passWord, new OkHttpUtils.OnCompleteListener<Result>() {
                     @Override
                     public void onSuccess(Result result) {
@@ -142,19 +135,5 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(this, RegisterActivity.class);
         MFGT.startActivity(this, intent);
     }
-
-    class MyReceiver extends BroadcastReceiver{
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String useName = intent.getStringExtra("userName");
-            String passWord = intent.getStringExtra("passWord");
-            L.i("userName:"+useName+",passWord:"+passWord);
-            if(useName!=null&&passWord!=null){
-                mLoginPassWord.setText(passWord);
-                mLoginUserName.setText(useName);
-            }
-        }
-    }
-
 
 }

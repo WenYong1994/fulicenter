@@ -2,6 +2,7 @@ package cn.ucai.fulicenter.fragment;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
@@ -18,15 +20,19 @@ import butterknife.OnClick;
 import cn.ucai.fulicenter.R;
 import cn.ucai.fulicenter.activity.CollectActivity;
 import cn.ucai.fulicenter.activity.MainActivity;
+import cn.ucai.fulicenter.activity.UpdataPersionActivity;
 import cn.ucai.fulicenter.application.FuLiCenterApplication;
 import cn.ucai.fulicenter.bean.CollectBean;
 import cn.ucai.fulicenter.bean.MessageBean;
+import cn.ucai.fulicenter.bean.Result;
 import cn.ucai.fulicenter.bean.UserAvatar;
+import cn.ucai.fulicenter.mydb.DBDao;
 import cn.ucai.fulicenter.utils.CommonUtils;
 import cn.ucai.fulicenter.utils.I;
 import cn.ucai.fulicenter.utils.L;
 import cn.ucai.fulicenter.utils.MFGT;
 import cn.ucai.fulicenter.utils.OkHttpUtils;
+import cn.ucai.fulicenter.utilsdao.UtilsDao;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -80,16 +86,8 @@ public class PersionFragment extends Fragment {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.m_Persion_Setting:
-
-
-
-
-
-
-
-
-
-
+                Intent intent1 = new Intent((MainActivity)getContext(), UpdataPersionActivity.class);
+                MFGT.startActivity((MainActivity)getContext(),intent1);
                 break;
             case R.id.m_Persion_m_Persion_Collect_Treasure_Lin:
                 Intent intent = new Intent((MainActivity)getContext(), CollectActivity.class);
@@ -102,7 +100,9 @@ public class PersionFragment extends Fragment {
     public void onResume() {
         super.onResume();
         //在网页上面下载收藏商品的信息
+        user=FuLiCenterApplication.getInstance().getUserAvatar();
         if(user!=null){
+            mPersionUserNick.setText(user.getMuserNick());
             new OkHttpUtils<MessageBean>(getContext())
                     .url(I.SERVER_ROOT+I.REQUEST_FIND_COLLECT_COUNT)
                     .addParam(I.Collect.USER_NAME,user.getMuserName())
@@ -110,14 +110,61 @@ public class PersionFragment extends Fragment {
                     .execute(new OkHttpUtils.OnCompleteListener<MessageBean>() {
                         @Override
                         public void onSuccess(MessageBean result) {
-                            mPersionCollectTreasure.setText(result.getMsg());
+                            if(result.getMsg().equals("查询失败")){
+                                mPersionCollectTreasure.setText(0+"");
+                            }else {
+                                mPersionCollectTreasure.setText(result.getMsg());
+                            }
                         }
-
                         @Override
                         public void onError(String error) {
                             CommonUtils.showShortToast("获取收藏数量失败");
                         }
                     });
         }
+        //这里就是在网络上更新数据
+        UtilsDao.login(getContext(), user.getMuserName(), FuLiCenterApplication.getInstance().getPassWord(), new OkHttpUtils.OnCompleteListener<Result>() {
+            @Override
+            public void onSuccess(Result result) {
+                if(result!=null){
+                    if(result.isRetMsg()){
+                        String str= result.getRetData().toString();
+                        Gson gson = new Gson();
+                        UserAvatar userAvatar = gson.fromJson(str, UserAvatar.class);
+                        FuLiCenterApplication.getInstance().setUserName(userAvatar.getMuserName());
+                        //如果登录成功了，就把账号保存在首选项
+                        saveUserName(userAvatar.getMuserName());
+                        //这个是把对象保存在Application和Application里面
+                        new DBDao(FuLiCenterApplication.getInstance()).savaUser(userAvatar);
+                        FuLiCenterApplication.getInstance().setUserAvatar(userAvatar);
+                        Picasso.with(getContext())
+                                .load(I.SERVER_ROOT + I.REQUEST_DOWNLOAD_AVATAR + "?"
+                                        + I.NAME_OR_HXID + "=" + userAvatar.getMuserName() + "&avatarType=user_avatar&m_avatar_suffix=.jpg&width=200&height=200")
+                                .error(R.drawable.user_avatar)
+                                .placeholder(R.drawable.user_avatar)
+                                .into(mPersionUserAvatar);
+                    }else {
+                        CommonUtils.showShortToast("账号密码被修改");
+                    }
+                }else {
+                    CommonUtils.showShortToast("登录失败");
+                }
+
+            }
+            @Override
+            public void onError(String error) {
+                CommonUtils.showShortToast("网络开小差中...");
+            }
+        });
+
     }
+
+    private void saveUserName(String userName) {
+        SharedPreferences sp = getActivity().getSharedPreferences("fulicenter_userName",getActivity().MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("userName",userName);
+        editor.commit();
+    }
+
+
 }
