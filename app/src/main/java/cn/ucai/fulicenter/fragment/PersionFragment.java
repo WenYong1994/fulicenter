@@ -3,6 +3,7 @@ package cn.ucai.fulicenter.fragment;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -29,6 +30,7 @@ import cn.ucai.fulicenter.bean.UserAvatar;
 import cn.ucai.fulicenter.mydb.DBDao;
 import cn.ucai.fulicenter.utils.CommonUtils;
 import cn.ucai.fulicenter.utils.I;
+import cn.ucai.fulicenter.utils.ImageLoader;
 import cn.ucai.fulicenter.utils.L;
 import cn.ucai.fulicenter.utils.MFGT;
 import cn.ucai.fulicenter.utils.OkHttpUtils;
@@ -67,12 +69,25 @@ public class PersionFragment extends Fragment {
         user = FuLiCenterApplication.getInstance().getUserAvatar();
         if(user!=null){
             mPersionUserNick.setText(FuLiCenterApplication.getInstance().getUserAvatar().getMuserNick());
+
+            //这一句是清理缓存，图片可以瞬间显示；
+            String str = I.SERVER_ROOT + I.REQUEST_DOWNLOAD_AVATAR + "?"
+                    + I.NAME_OR_HXID + "=" + user.getMuserName() +
+                    "&avatarType=user_avatar&m_avatar_suffix="+
+                    user.getMavatarSuffix()+"&width=200&height=200";
+            Uri uri = Uri.parse(str);
+
             Picasso.with(getContext())
                     .load(I.SERVER_ROOT + I.REQUEST_DOWNLOAD_AVATAR + "?"
-                            + I.NAME_OR_HXID + "=" + user.getMuserName() + "&avatarType=user_avatar&m_avatar_suffix=.jpg&width=200&height=200")
+                            + I.NAME_OR_HXID + "=" + user.getMuserName() + "&avatarType=user_avatar&m_avatar_suffix="+user.getMavatarSuffix()+"&width=200&height=200")
                     .error(R.drawable.user_avatar)
                     .placeholder(R.drawable.user_avatar)
                     .into(mPersionUserAvatar);
+
+            /*String strurl= I.SERVER_ROOT + I.REQUEST_DOWNLOAD_AVATAR + "?"
+                    + I.NAME_OR_HXID + "=" + user.getMuserName() + "&avatarType=user_avatar&m_avatar_suffix="
+                    +user.getMavatarSuffix()+"&width=50&height=50";
+            ImageLoader.setImage(strurl,getContext(),mPersionUserAvatar,false);*/
         }
     }
     @Override
@@ -102,6 +117,18 @@ public class PersionFragment extends Fragment {
         //在网页上面下载收藏商品的信息
         user=FuLiCenterApplication.getInstance().getUserAvatar();
         if(user!=null){
+            Picasso.with(getContext())
+                    .load(I.SERVER_ROOT + I.REQUEST_DOWNLOAD_AVATAR + "?"
+                            + I.NAME_OR_HXID + "=" + user.getMuserName() + "&avatarType=user_avatar&m_avatar_suffix="+user.getMavatarSuffix()+"&width=200&height=200")
+                    .error(R.drawable.user_avatar)
+                    .placeholder(R.drawable.user_avatar)
+                    .into(mPersionUserAvatar);
+            /*String strurl= I.SERVER_ROOT + I.REQUEST_DOWNLOAD_AVATAR + "?"
+                    + I.NAME_OR_HXID + "=" + user.getMuserName() + "&avatarType=user_avatar&m_avatar_suffix="
+                    +user.getMavatarSuffix()+"&width=50&height=50";
+            L.e(strurl);
+            ImageLoader.setImage(strurl,getContext(),mPersionUserAvatar,false);*/
+
             mPersionUserNick.setText(user.getMuserNick());
             new OkHttpUtils<MessageBean>(getContext())
                     .url(I.SERVER_ROOT+I.REQUEST_FIND_COLLECT_COUNT)
@@ -110,10 +137,14 @@ public class PersionFragment extends Fragment {
                     .execute(new OkHttpUtils.OnCompleteListener<MessageBean>() {
                         @Override
                         public void onSuccess(MessageBean result) {
-                            if(result.getMsg().equals("查询失败")){
-                                mPersionCollectTreasure.setText(0+"");
+                            if(result.isSuccess()){
+                                if(result.getMsg().equals("查询失败")){
+                                    mPersionCollectTreasure.setText(0+"");
+                                }else {
+                                    mPersionCollectTreasure.setText(result.getMsg());
+                                }
                             }else {
-                                mPersionCollectTreasure.setText(result.getMsg());
+                                CommonUtils.showShortToast("获取收藏数量失败");
                             }
                         }
                         @Override
@@ -122,49 +153,5 @@ public class PersionFragment extends Fragment {
                         }
                     });
         }
-        //这里就是在网络上更新数据
-        UtilsDao.login(getContext(), user.getMuserName(), FuLiCenterApplication.getInstance().getPassWord(), new OkHttpUtils.OnCompleteListener<Result>() {
-            @Override
-            public void onSuccess(Result result) {
-                if(result!=null){
-                    if(result.isRetMsg()){
-                        String str= result.getRetData().toString();
-                        Gson gson = new Gson();
-                        UserAvatar userAvatar = gson.fromJson(str, UserAvatar.class);
-                        FuLiCenterApplication.getInstance().setUserName(userAvatar.getMuserName());
-                        //如果登录成功了，就把账号保存在首选项
-                        saveUserName(userAvatar.getMuserName());
-                        //这个是把对象保存在Application和Application里面
-                        new DBDao(FuLiCenterApplication.getInstance()).savaUser(userAvatar);
-                        FuLiCenterApplication.getInstance().setUserAvatar(userAvatar);
-                        Picasso.with(getContext())
-                                .load(I.SERVER_ROOT + I.REQUEST_DOWNLOAD_AVATAR + "?"
-                                        + I.NAME_OR_HXID + "=" + userAvatar.getMuserName() + "&avatarType=user_avatar&m_avatar_suffix=.jpg&width=200&height=200")
-                                .error(R.drawable.user_avatar)
-                                .placeholder(R.drawable.user_avatar)
-                                .into(mPersionUserAvatar);
-                    }else {
-                        CommonUtils.showShortToast("账号密码被修改");
-                    }
-                }else {
-                    CommonUtils.showShortToast("登录失败");
-                }
-
-            }
-            @Override
-            public void onError(String error) {
-                CommonUtils.showShortToast("网络开小差中...");
-            }
-        });
-
     }
-
-    private void saveUserName(String userName) {
-        SharedPreferences sp = getActivity().getSharedPreferences("fulicenter_userName",getActivity().MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putString("userName",userName);
-        editor.commit();
-    }
-
-
 }

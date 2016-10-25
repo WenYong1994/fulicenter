@@ -80,7 +80,6 @@ public class LoginActivity extends AppCompatActivity {
                 pb.show();
                 final String userName = mLoginUserName.getText().toString().trim();
                 String passWord = mLoginPassWord.getText().toString().trim();
-                FuLiCenterApplication.getInstance().setPassWord(passWord);
                 UtilsDao.login(this, userName, passWord, new OkHttpUtils.OnCompleteListener<Result>() {
                     @Override
                     public void onSuccess(Result result) {
@@ -88,15 +87,15 @@ public class LoginActivity extends AppCompatActivity {
                             pb.dismiss();
                             if(result.isRetMsg()){
                                 CommonUtils.showShortToast("登录成功");
-                                FuLiCenterApplication.getInstance().setUserName(userName);
-                                //如果登录成功了，就把账号保存在首选项
-                                saveUserName(userName);
-                                //这个是把对象保存在Application和Application里面
                                 String str= result.getRetData().toString();
                                 Gson gson = new Gson();
                                 UserAvatar userAvatar = gson.fromJson(str, UserAvatar.class);
                                 new DBDao(FuLiCenterApplication.getInstance()).savaUser(userAvatar);
                                 FuLiCenterApplication.getInstance().setUserAvatar(userAvatar);
+                                FuLiCenterApplication.getInstance().setUserName(userName);
+                                //如果登录成功了，就把账号保存在首选项
+                                saveUserName(userName);
+                                //这个是把对象保存在Application和Application里面
                                 Intent intent = new Intent();
                                 setResult(1,intent);
                                 finish();
@@ -135,5 +134,4 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(this, RegisterActivity.class);
         MFGT.startActivity(this, intent);
     }
-
 }

@@ -73,7 +73,7 @@ public class UpdataNickActivity extends AppCompatActivity {
                                 Gson gson = new Gson();
                                 UserAvatar userAvatar1 = gson.fromJson(strJson, UserAvatar.class);
                                 if(new DBDao(FuLiCenterApplication.getInstance()).updataUser(userAvatar1)){
-                                    CommonUtils.showShortToast("数据库修改成功");
+
                                 }
                                 MFGT.finish(UpdataNickActivity.this);
                             }
