@@ -182,11 +182,19 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
         setMGoodDetailTitleBackListener();
         setMGoodsDetailTitleShareListener();
         setMGoodsDetatileColoect();
+        setTitleCars();
+    }
+
+    private void setTitleCars() {
         mgoodDetailTitleCars.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(user==null){
+                    CommonUtils.showShortToast("请先登录");
+                    return;
+                }
                 if(isCart){
-                    //就代表已近被添加到购物车中,点击就让商品数量加一
+                    //就代表已被添加到购物车中,点击就让商品数量加一
                     new OkHttpUtils<MessageBean>(GoodsDetailsActivity.this).url(I.SERVER_ROOT+I.REQUEST_UPDATE_CART)
                             .targetClass(MessageBean.class)
                             .addParam(I.Cart.ID,carId+"")
@@ -219,9 +227,10 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
                                 public void onSuccess(MessageBean result) {
                                     if(result.isSuccess()){
                                         isCart=true;
-                                        CommonUtils.showShortToast("已近添加商品到购物车中");
+                                        CommonUtils.showShortToast("已添加商品到购物车中");
                                         cartCount=1;
                                         mGoodDetailTitlCarsHint.setText(""+cartCount);
+                                        carId=Integer.parseInt(result.getMsg());
                                     }
                                 }
 
@@ -240,6 +249,7 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
             @Override
             public void onClick(View v) {
                 if(user==null){
+                    CommonUtils.showShortToast("请先登录");
                     return;
                 }
                 if(isCollect){
@@ -351,41 +361,43 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
                         CommonUtils.showShortToast(error);
                     }
                 });
-
-
-        //在网络段下载收藏信息，判断这个商品是否被添加到购物车中
         user=FuLiCenterApplication.getInstance().getUserAvatar();
-        new OkHttpUtils<CartBean[]>(this)
-                .url(I.SERVER_ROOT+I.REQUEST_FIND_CARTS)
-                .targetClass(CartBean[].class)
-                .addParam(I.Cart.USER_NAME,user.getMuserName())
-                .execute(new OkHttpUtils.OnCompleteListener<CartBean[]>() {
-                    @Override
-                    public void onSuccess(CartBean[] result) {
-                        if(result!=null){
-                            for(CartBean bean:result){
-                                if(bean.getGoodsId()==id){
-                                    //这就代表是被添加到购物车中的商品
-                                    carId=bean.getId();
-                                    mGoodDetailTitlCarsHint.setText(bean.getCount());
-                                    cartCount=bean.getCount();
-                                    isCart=true;
-                                    return;
+        if(user!=null){
+            //在网络段下载收藏信息，判断这个商品是否被添加到购物车中
+
+            new OkHttpUtils<CartBean[]>(this)
+                    .url(I.SERVER_ROOT+I.REQUEST_FIND_CARTS)
+                    .targetClass(CartBean[].class)
+                    .addParam(I.Cart.USER_NAME,user.getMuserName())
+                    .execute(new OkHttpUtils.OnCompleteListener<CartBean[]>() {
+                        @Override
+                        public void onSuccess(CartBean[] result) {
+                            if(result!=null){
+                                for(CartBean bean:result){
+                                    if(bean.getGoodsId()==id){
+                                        //这就代表是被添加到购物车中的商品
+                                        carId=bean.getId();
+                                        mGoodDetailTitlCarsHint.setText(bean.getCount()+"");
+                                        cartCount=bean.getCount();
+                                        isCart=true;
+                                        return;
+                                    }
                                 }
+                                isCart=false;
+                                cartCount=0;
+                                mGoodDetailTitlCarsHint.setText(cartCount+"");
+                            }else {
+                                CommonUtils.showShortToast("获取购物车信息失败");
                             }
-                            isCart=false;
-                            cartCount=0;
-                            mGoodDetailTitlCarsHint.setText(cartCount+"");
-                        }else {
+                        }
+
+                        @Override
+                        public void onError(String error) {
                             CommonUtils.showShortToast("获取购物车信息失败");
                         }
-                    }
+                    });
+        }
 
-                    @Override
-                    public void onError(String error) {
-                        CommonUtils.showShortToast("获取购物车信息失败");
-                    }
-                });
     }
     private void initAdapter() {
         mImagerViewList =new ArrayList<>();

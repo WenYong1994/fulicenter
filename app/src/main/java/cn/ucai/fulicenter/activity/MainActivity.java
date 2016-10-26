@@ -15,6 +15,7 @@ import cn.ucai.fulicenter.application.FuLiCenterApplication;
 import cn.ucai.fulicenter.bean.CartBean;
 import cn.ucai.fulicenter.bean.UserAvatar;
 import cn.ucai.fulicenter.fragment.BoutiqueFragment;
+import cn.ucai.fulicenter.fragment.CartFragment;
 import cn.ucai.fulicenter.fragment.CategoryFragment;
 import cn.ucai.fulicenter.fragment.NewGoodsFragment;
 import cn.ucai.fulicenter.fragment.PersionFragment;
@@ -103,10 +104,11 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.rb_id_cars:
                 mutual((RadioButton) v);
-
-
-
-
+                CartFragment fragmentCart =new CartFragment();
+                FragmentTransaction ftCart = getSupportFragmentManager().beginTransaction();
+                ftCart.replace(R.id.newgoods_fragment_one,fragmentCart);
+                ftCart.commit();
+                ftCart=null;
                 break;
             case R.id.rb_id_persional_center:
                 if(FuLiCenterApplication.getInstance().getUserName()==null){
@@ -146,28 +148,31 @@ public class MainActivity extends AppCompatActivity {
             ftNewgoods1=null;
         }
         userAvatar=FuLiCenterApplication.getInstance().getUserAvatar();
-        //获取购物车中的数量
-        new OkHttpUtils<CartBean[]>(this)
-                .url(I.SERVER_ROOT+I.REQUEST_FIND_CARTS)
-                .targetClass(CartBean[].class)
-                .addParam(I.Cart.USER_NAME,userAvatar.getMuserName())
-                .execute(new OkHttpUtils.OnCompleteListener<CartBean[]>() {
-                    @Override
-                    public void onSuccess(CartBean[] result) {
-                        if(result!=null){
-                            mCarsHint.setText(result.length+"");
-                        }else {
+        if(userAvatar!=null){
+            //获取购物车中的数量
+            new OkHttpUtils<CartBean[]>(this)
+                    .url(I.SERVER_ROOT+I.REQUEST_FIND_CARTS)
+                    .targetClass(CartBean[].class)
+                    .addParam(I.Cart.USER_NAME,userAvatar.getMuserName())
+                    .execute(new OkHttpUtils.OnCompleteListener<CartBean[]>() {
+                        @Override
+                        public void onSuccess(CartBean[] result) {
+                            if(result!=null){
+                                int total=0;
+                                for(CartBean bean:result){
+                                    total+=bean.getCount();
+                                }
+                                mCarsHint.setText(total+"");
+                            }else {
+                                CommonUtils.showShortToast("获取购物车信息失败");
+                            }
+                        }
+                        @Override
+                        public void onError(String error) {
                             CommonUtils.showShortToast("获取购物车信息失败");
                         }
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        CommonUtils.showShortToast("获取购物车信息失败");
-                    }
-                });
-
-
+                    });
+        }
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
