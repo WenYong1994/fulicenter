@@ -138,13 +138,13 @@ public class PersionFragment extends Fragment {
                         @Override
                         public void onSuccess(MessageBean result) {
                             if(result.isSuccess()){
-                                if(result.getMsg().equals("查询失败")){
+                                if(result.getMsg().charAt(0)>'9'||result.getMsg().charAt(0)<'0'){
                                     mPersionCollectTreasure.setText(0+"");
                                 }else {
                                     mPersionCollectTreasure.setText(result.getMsg());
                                 }
                             }else {
-                                CommonUtils.showShortToast("获取收藏数量失败");
+                                mPersionCollectTreasure.setText(0+"");
                             }
                         }
                         @Override

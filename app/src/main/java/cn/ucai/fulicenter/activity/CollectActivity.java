@@ -192,6 +192,7 @@ public class CollectActivity extends AppCompatActivity {
 
         boolean isMore = true;
 
+
         public boolean isMore() {
             return isMore;
         }
@@ -213,6 +214,11 @@ public class CollectActivity extends AppCompatActivity {
 
         public void addList(ArrayList<CollectBean> list) {
             this.list.addAll(list);
+            notifyDataSetChanged();
+        }
+
+        public void removeList(int position){
+            this.list.remove(position);
             notifyDataSetChanged();
         }
 
@@ -258,9 +264,13 @@ public class CollectActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     int position = (int) v.getTag();
                     CollectBean bean = list.get(position);
-                    Intent intent = new Intent();
+
+                    //这里使用startActivityForResult。来获取商品是否被取消收藏
+                    Intent intent = new Intent(CollectActivity.this,GoodsDetailsActivity.class);
                     intent.putExtra("id", bean.getGoodsId());
-                    MFGT.startActivity((CollectActivity) context, GoodsDetailsActivity.class, intent);
+                    intent.putExtra("position",position);
+                    startActivityForResult(intent,1);
+                    overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
                 }
             });
             return holder;
@@ -301,12 +311,22 @@ public class CollectActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode==1){
+            if(resultCode==RESULT_OK){
+                int position = data.getIntExtra("position",-1);
+                if(position>=0){
+                    adapter.removeList(position);
+                }
+            }
+        }
+    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         ButterKnife.unbind(this);
     }
-
 
 }

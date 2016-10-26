@@ -71,6 +71,7 @@
                 android:layout_height="wrap_content"
                 android:text="10"
                 android:textColor="#fff"
+                android:gravity="center"
                 android:background="@drawable/cart_hint"
                 android:layout_alignRight="@id/rb_id_cars"
                 />

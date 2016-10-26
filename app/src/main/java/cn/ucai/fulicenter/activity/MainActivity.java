@@ -8,20 +8,28 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
 import cn.ucai.fulicenter.R;
 import cn.ucai.fulicenter.application.FuLiCenterApplication;
+import cn.ucai.fulicenter.bean.CartBean;
+import cn.ucai.fulicenter.bean.UserAvatar;
 import cn.ucai.fulicenter.fragment.BoutiqueFragment;
 import cn.ucai.fulicenter.fragment.CategoryFragment;
 import cn.ucai.fulicenter.fragment.NewGoodsFragment;
 import cn.ucai.fulicenter.fragment.PersionFragment;
 import cn.ucai.fulicenter.utils.CommonUtils;
+import cn.ucai.fulicenter.utils.I;
 import cn.ucai.fulicenter.utils.L;
 import cn.ucai.fulicenter.utils.MFGT;
+import cn.ucai.fulicenter.utils.OkHttpUtils;
 
 public class MainActivity extends AppCompatActivity {
     RadioButton mRabtn_NewGoods,mRabtn_Boutique,
             mRabtn_Category,mRabtn_Cars,mRabtn_Personal_Center;
+    TextView mCarsHint;
+
+    UserAvatar userAvatar;
 
     FragmentTransaction ftPersion,ftNewgoods,ftBoutique,ftCategory;
     //设置一个变量来判断是否登录成功
@@ -39,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
+        mCarsHint= (TextView) findViewById(R.id.tv_id_car_hint);
         mRabtn_NewGoods = (RadioButton) findViewById(R.id.rb_id_newgoods);
         mLastCheckNoPersion=mRabtn_NewGoods;
         mLastShowNoPersion=new NewGoodsFragment();
@@ -136,6 +145,29 @@ public class MainActivity extends AppCompatActivity {
             ftNewgoods1.commitAllowingStateLoss();
             ftNewgoods1=null;
         }
+        userAvatar=FuLiCenterApplication.getInstance().getUserAvatar();
+        //获取购物车中的数量
+        new OkHttpUtils<CartBean[]>(this)
+                .url(I.SERVER_ROOT+I.REQUEST_FIND_CARTS)
+                .targetClass(CartBean[].class)
+                .addParam(I.Cart.USER_NAME,userAvatar.getMuserName())
+                .execute(new OkHttpUtils.OnCompleteListener<CartBean[]>() {
+                    @Override
+                    public void onSuccess(CartBean[] result) {
+                        if(result!=null){
+                            mCarsHint.setText(result.length+"");
+                        }else {
+                            CommonUtils.showShortToast("获取购物车信息失败");
+                        }
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        CommonUtils.showShortToast("获取购物车信息失败");
+                    }
+                });
+
+
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -174,4 +206,6 @@ public class MainActivity extends AppCompatActivity {
             mRabtn_Personal_Center.setChecked(false);
         }
     }
+
+
 }

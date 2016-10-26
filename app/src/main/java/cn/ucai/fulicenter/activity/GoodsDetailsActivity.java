@@ -34,6 +34,7 @@ import cn.sharesdk.onekeyshare.OnekeyShare;
 import cn.ucai.fulicenter.R;
 import cn.ucai.fulicenter.application.FuLiCenterApplication;
 import cn.ucai.fulicenter.bean.AlbumsBean;
+import cn.ucai.fulicenter.bean.CartBean;
 import cn.ucai.fulicenter.bean.GoodsDetailsBean;
 import cn.ucai.fulicenter.bean.MessageBean;
 import cn.ucai.fulicenter.bean.UserAvatar;
@@ -74,7 +75,7 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
     @Bind(R.id.good_detail_cercle)
     Cercle mGoodDetailCercle;
     @Bind(R.id.good_detail_title_cars_hint)
-    TextView nGoodDetailTitlCarsHint;
+    TextView mGoodDetailTitlCarsHint;
 
     //定义一个数组来存储商品详情的图片uri
     ArrayList<AlbumsBean> mAlbumsBeanList;
@@ -86,11 +87,16 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
     int id;
     UserAvatar user;
 
+    //定义一个变量来保存商品是否被添加到购物车
+    boolean isCart=false;
+    int cartCount;
+
     boolean isRun=false;
     int mFocus=-1;
     Handler mHandler;
-    int mCount;
+    int mCount=0;
     boolean isOnTouch=false;
+    int carId;
 
 
     @Override
@@ -176,6 +182,57 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
         setMGoodDetailTitleBackListener();
         setMGoodsDetailTitleShareListener();
         setMGoodsDetatileColoect();
+        mgoodDetailTitleCars.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isCart){
+                    //就代表已近被添加到购物车中,点击就让商品数量加一
+                    new OkHttpUtils<MessageBean>(GoodsDetailsActivity.this).url(I.SERVER_ROOT+I.REQUEST_UPDATE_CART)
+                            .targetClass(MessageBean.class)
+                            .addParam(I.Cart.ID,carId+"")
+                            .addParam(I.Cart.COUNT,cartCount+1+"")
+                            .addParam(I.Cart.IS_CHECKED,true+"")
+                            .execute(new OkHttpUtils.OnCompleteListener<MessageBean>() {
+                                @Override
+                                public void onSuccess(MessageBean result) {
+                                    if (result.isSuccess()){
+                                        cartCount++;
+                                        mGoodDetailTitlCarsHint.setText(cartCount+"");
+                                    }
+                                }
+                                @Override
+                                public void onError(String error) {
+                                    CommonUtils.showShortToast("增加选中数量失败");
+                                }
+                            });
+                }else {
+                    //点击事件就是添加到购物车中去
+                    new OkHttpUtils<MessageBean>(GoodsDetailsActivity.this)
+                            .url(I.SERVER_ROOT+I.REQUEST_ADD_CART)
+                            .addParam(I.Cart.USER_NAME,user.getMuserName())
+                            .addParam(I.Cart.GOODS_ID,id+"")
+                            .addParam(I.Cart.COUNT,1+"")
+                            .addParam(I.Cart.IS_CHECKED,true+"")
+                            .targetClass(MessageBean.class)
+                            .execute(new OkHttpUtils.OnCompleteListener<MessageBean>() {
+                                @Override
+                                public void onSuccess(MessageBean result) {
+                                    if(result.isSuccess()){
+                                        isCart=true;
+                                        CommonUtils.showShortToast("已近添加商品到购物车中");
+                                        cartCount=1;
+                                        mGoodDetailTitlCarsHint.setText(""+cartCount);
+                                    }
+                                }
+
+                                @Override
+                                public void onError(String error) {
+                                    CommonUtils.showShortToast("添加到购物车失败");
+                                }
+                            });
+                }
+            }
+        });
     }
 
     private void setMGoodsDetatileColoect() {
@@ -252,6 +309,14 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
         mgoodDetailTitleBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(isCollect==false){
+                    //这里是如果取消收藏，就把这个商品在我的收藏页面里Adapter里面position传回去，用于remove
+                    Intent intent1 = getIntent();
+                    int position = intent1.getIntExtra("position",-1);
+                    Intent intent = new Intent();
+                    intent.putExtra("position",position);
+                    setResult(RESULT_OK,intent);
+                }
                 MFGT.finish(GoodsDetailsActivity.this);
             }
         });
@@ -284,6 +349,41 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
                     @Override
                     public void onError(String error) {
                         CommonUtils.showShortToast(error);
+                    }
+                });
+
+
+        //在网络段下载收藏信息，判断这个商品是否被添加到购物车中
+        user=FuLiCenterApplication.getInstance().getUserAvatar();
+        new OkHttpUtils<CartBean[]>(this)
+                .url(I.SERVER_ROOT+I.REQUEST_FIND_CARTS)
+                .targetClass(CartBean[].class)
+                .addParam(I.Cart.USER_NAME,user.getMuserName())
+                .execute(new OkHttpUtils.OnCompleteListener<CartBean[]>() {
+                    @Override
+                    public void onSuccess(CartBean[] result) {
+                        if(result!=null){
+                            for(CartBean bean:result){
+                                if(bean.getGoodsId()==id){
+                                    //这就代表是被添加到购物车中的商品
+                                    carId=bean.getId();
+                                    mGoodDetailTitlCarsHint.setText(bean.getCount());
+                                    cartCount=bean.getCount();
+                                    isCart=true;
+                                    return;
+                                }
+                            }
+                            isCart=false;
+                            cartCount=0;
+                            mGoodDetailTitlCarsHint.setText(cartCount+"");
+                        }else {
+                            CommonUtils.showShortToast("获取购物车信息失败");
+                        }
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        CommonUtils.showShortToast("获取购物车信息失败");
                     }
                 });
     }
@@ -396,9 +496,21 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
 
     @Override
     public void onBackPressed() {
+
+        if(isCollect==false){
+            //这里是如果取消收藏，就把这个商品在我的收藏页面里Adapter里面position传回去，用于remove
+            Intent intent1 = getIntent();
+            int position = intent1.getIntExtra("position",-1);
+            Intent intent = new Intent();
+            intent.putExtra("position",position);
+            setResult(RESULT_OK,intent);
+        }
+
         MFGT.finish(this);
         super.onBackPressed();
+
     }
+
 
     @Override
     protected void onDestroy() {
