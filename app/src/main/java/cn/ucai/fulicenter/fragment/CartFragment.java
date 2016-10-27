@@ -3,10 +3,13 @@ package cn.ucai.fulicenter.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +19,16 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cn.ucai.fulicenter.R;
 import cn.ucai.fulicenter.application.FuLiCenterApplication;
+import cn.ucai.fulicenter.bean.AlbumsBean;
 import cn.ucai.fulicenter.bean.CartBean;
 import cn.ucai.fulicenter.bean.GoodsDetailsBean;
 import cn.ucai.fulicenter.bean.UserAvatar;
@@ -39,9 +47,10 @@ public class CartFragment extends Fragment {
     int page_id=1;
     final int PAGE_SIZE=10;
 
+    final int DOWN_OVER=0;
+
     GoodsAdapter adapter;
     LinearLayoutManager manager;
-
 
     UserAvatar userAvatar;
 
@@ -73,6 +82,7 @@ public class CartFragment extends Fragment {
         return view;
     }
 
+
     private void initView() {
         ArrayList<CartBean> list = new ArrayList<>();
         adapter=new GoodsAdapter(list,getContext());
@@ -102,6 +112,8 @@ public class CartFragment extends Fragment {
                                     break;
                                 case PULL_DOWN:
 
+
+
                                     break;
                             }
                         }
@@ -112,7 +124,10 @@ public class CartFragment extends Fragment {
                         CommonUtils.showShortToast("获取购物车信息失败");
                     }
                 });
+
     }
+
+
 
     class CartGoodsViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.m_Cart_Check)
@@ -137,12 +152,28 @@ public class CartFragment extends Fragment {
         }
     }
 
+    //创建一个方法利用正则表达式，将价格字符串转换为整形变量
+    public int privice2Int(String privice) {
+        Pattern pattern = Pattern.compile("[0-9]");
+        Matcher matcher = pattern.matcher(privice);
+        String intPrivice = "0";
+        if (matcher.find()) {
+            intPrivice = privice.substring(privice.indexOf(matcher.group()));
+        }
+        return Integer.parseInt(intPrivice);
+    }
+
 
     class GoodsAdapter extends RecyclerView.Adapter<CartGoodsViewHolder> {
         //定义一个变量来保存价格总和
         int mTotalPrivice=0;
 
         boolean isMore=true;
+
+        ArrayList<CartBean> list;
+        int falg=0;
+        Context context;
+        HashMap<Integer,GoodsDetailsBean> map=new HashMap<>();
 
         public boolean isMore() {
             return isMore;
@@ -151,9 +182,6 @@ public class CartFragment extends Fragment {
         public void setMore(boolean more) {
             isMore = more;
         }
-
-        ArrayList<CartBean> list;
-        Context context;
 
 
         public void addList(ArrayList<CartBean> list){
@@ -188,32 +216,19 @@ public class CartFragment extends Fragment {
                 holder.mCartCheck.setImageResource(R.mipmap.checkbox_normal);
             }
             holder.mCartGoodsCount.setText("("+bean.getCount()+")");
-            int id = bean.getGoodsId();
-            L.e(id+"");
-            new OkHttpUtils<GoodsDetailsBean>(context)
-                    .url(I.SERVER_ROOT+I.REQUEST_FIND_GOOD_DETAILS)
-                    .targetClass(GoodsDetailsBean.class)
-                    .addParam(I.GoodsDetails.KEY_GOODS_ID,id+"")
-                    .execute(new OkHttpUtils.OnCompleteListener<GoodsDetailsBean>() {
-                        @Override
-                        public void onSuccess(GoodsDetailsBean result) {
-                            holder.mCartGoodsName.setText(result.getGoodsName());
-                            Picasso.with(context).load(I.SERVER_ROOT+I.REQUEST_DOWNLOAD_IMAGE+"?"+I.Boutique.IMAGE_URL+
-                                    "="+result.getGoodsImg())
-                                    .placeholder(R.drawable.nopic)
-                                    .error(R.drawable.nopic)
-                                    .into(holder.mCartIv);
-                            holder.mCartPrivice.setText(result.getShopPrice());
-                        }
+            holder.mCartGoodsName.setText(bean.getGoods().getGoodsName());
+            
 
-                        @Override
-                        public void onError(String error) {
-                            holder.mCartGoodsName.setText("未获取商品信息");
-                            holder.mCartPrivice.setText("未获取商品信息");
 
-                        }
-                    });
+
         }
+
+
+
+
+
+
+
         @Override
         public int getItemCount() {
             return list==null?0:list.size();
