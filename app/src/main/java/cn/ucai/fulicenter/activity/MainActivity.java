@@ -150,30 +150,35 @@ public class MainActivity extends AppCompatActivity {
         userAvatar=FuLiCenterApplication.getInstance().getUserAvatar();
         if(userAvatar!=null){
             //获取购物车中的数量
-            new OkHttpUtils<CartBean[]>(this)
-                    .url(I.SERVER_ROOT+I.REQUEST_FIND_CARTS)
-                    .targetClass(CartBean[].class)
-                    .addParam(I.Cart.USER_NAME,userAvatar.getMuserName())
-                    .execute(new OkHttpUtils.OnCompleteListener<CartBean[]>() {
-                        @Override
-                        public void onSuccess(CartBean[] result) {
-                            if(result!=null){
-                                int total=0;
-                                for(CartBean bean:result){
-                                    total+=bean.getCount();
-                                }
-                                mCarsHint.setText(total+"");
-                            }else {
-                                CommonUtils.showShortToast("获取购物车信息失败");
-                            }
-                        }
-                        @Override
-                        public void onError(String error) {
-                            CommonUtils.showShortToast("获取购物车信息失败");
-                        }
-                    });
+            setCartCount();
         }
     }
+
+    public void setCartCount() {
+        new OkHttpUtils<CartBean[]>(this)
+                .url(I.SERVER_ROOT+I.REQUEST_FIND_CARTS)
+                .targetClass(CartBean[].class)
+                .addParam(I.Cart.USER_NAME,userAvatar.getMuserName())
+                .execute(new OkHttpUtils.OnCompleteListener<CartBean[]>() {
+                    @Override
+                    public void onSuccess(CartBean[] result) {
+                        if(result!=null){
+                            int total=0;
+                            for(CartBean bean:result){
+                                total+=bean.getCount();
+                            }
+                            mCarsHint.setText(total+"");
+                        }else {
+                            CommonUtils.showShortToast("获取购物车信息失败");
+                        }
+                    }
+                    @Override
+                    public void onError(String error) {
+                        CommonUtils.showShortToast("获取购物车信息失败");
+                    }
+                });
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
