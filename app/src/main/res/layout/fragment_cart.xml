@@ -6,7 +6,16 @@
     tools:context="cn.ucai.fulicenter.fragment.CartFragment">
 
     <!-- TODO: Update blank fragment layout -->
+    <ImageView
+        android:id="@+id/m_Cart_Null"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/cart_null"
+        android:visibility="gone"
+        />
     <LinearLayout
+        android:id="@+id/m_Cart_Match_Lin"
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">

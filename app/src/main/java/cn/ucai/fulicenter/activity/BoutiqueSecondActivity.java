@@ -47,6 +47,7 @@ public class BoutiqueSecondActivity extends AppCompatActivity {
     int mNewState;
 
 
+
     final int PAGE_SIZE=6;
     int page_id =1;
 
@@ -112,6 +113,7 @@ public class BoutiqueSecondActivity extends AppCompatActivity {
         });
     }
 
+
     private void setManagerSpan() {
         mGridaLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
@@ -120,6 +122,7 @@ public class BoutiqueSecondActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private void initView() {
         list=new ArrayList<>();

@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -32,6 +33,7 @@ import cn.ucai.fulicenter.bean.MessageBean;
 import cn.ucai.fulicenter.bean.UserAvatar;
 import cn.ucai.fulicenter.utils.CommonUtils;
 import cn.ucai.fulicenter.utils.I;
+import cn.ucai.fulicenter.utils.L;
 import cn.ucai.fulicenter.utils.OkHttpUtils;
 
 /**
@@ -44,7 +46,7 @@ public class CartFragment extends Fragment {
     int page_id = 1;
     final int PAGE_SIZE = 10;
 
-
+    boolean isCatNull;
     GoodsAdapter adapter;
     LinearLayoutManager manager;
 
@@ -60,11 +62,14 @@ public class CartFragment extends Fragment {
     RecyclerView mCartRecy;
     @Bind(R.id.m_Cart_Swi)
     SwipeRefreshLayout mCartSwi;
+    @Bind(R.id.m_Cart_Null)
+    ImageView mCartNull;
+    @Bind(R.id.m_Cart_Match_Lin)
+    LinearLayout mCartMatchLin;
 
     public CartFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -124,6 +129,8 @@ public class CartFragment extends Fragment {
                                         bean.setChecked(false);
                                     }
                                     adapter.initOrRefreshList(list);
+
+                                    judgeListIsNull();
                                     adapter.addAllPrivice();
                                     break;
                                 case PULL_DOWN:
@@ -139,6 +146,16 @@ public class CartFragment extends Fragment {
                     }
                 });
 
+    }
+
+    private void judgeListIsNull() {
+        if (adapter.list.size() == 0) {
+            mCartNull.setVisibility(View.VISIBLE);
+            mCartMatchLin.setVisibility(View.GONE);
+        }else {
+            mCartNull.setVisibility(View.GONE);
+            mCartMatchLin.setVisibility(View.VISIBLE);
+        }
     }
 
     @OnClick(R.id.m_Cart_Pay)
@@ -233,8 +250,8 @@ public class CartFragment extends Fragment {
             holder.mCartCut.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final int potition = (Integer) v.getTag();
-                    final CartBean bean = list.get(potition);
+                    final int position = holder.getPosition();
+                    final CartBean bean = adapter.list.get(position);
                     if (bean.getCount() - 1 == 0) {
                         //就需要删除这个购物车信息
                         new OkHttpUtils<MessageBean>(context)
@@ -245,20 +262,20 @@ public class CartFragment extends Fragment {
                                     @Override
                                     public void onSuccess(MessageBean result) {
                                         if (result.isSuccess()) {
-                                            list.remove(potition);
-                                            notifyDataSetChanged();
+                                            adapter.list.remove(position);
+                                            adapter.notifyItemRangeRemoved(position,list.size());
                                             addAllPrivice();
-                                            ((MainActivity)getActivity()).setCartCount();
+                                            if(list.size()==0){
+                                                judgeListIsNull();
+                                            }
+                                            ((MainActivity) getActivity()).setCartCount();
                                         }
                                     }
-
                                     @Override
                                     public void onError(String error) {
 
                                     }
                                 });
-
-
                     }
                     if (bean.getCount() > 0) {
                         //就是将商品数量减一
@@ -274,9 +291,8 @@ public class CartFragment extends Fragment {
                                         bean.setCount(bean.getCount() - 1);
                                         holder.mCartGoodsCount.setText("(" + bean.getCount() + ")");
                                         addAllPrivice();
-                                        ((MainActivity)getActivity()).setCartCount();
+                                        ((MainActivity) getActivity()).setCartCount();
                                     }
-
                                     @Override
                                     public void onError(String error) {
 
@@ -286,7 +302,6 @@ public class CartFragment extends Fragment {
                 }
             });
         }
-
         private void setmCartCheckListener(final CartGoodsViewHolder holder) {
             holder.mCartCheck.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -307,7 +322,7 @@ public class CartFragment extends Fragment {
             holder.mCartAdd.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int position = (int) v.getTag();
+                    int position = holder.getPosition();
                     final CartBean bean = list.get(position);
                     new OkHttpUtils<MessageBean>(context)
                             .targetClass(MessageBean.class)
@@ -321,10 +336,9 @@ public class CartFragment extends Fragment {
                                         bean.setCount(bean.getCount() + 1);
                                         holder.mCartGoodsCount.setText("(" + bean.getCount() + ")");
                                         addAllPrivice();
-                                        ((MainActivity)getActivity()).setCartCount();
+                                        ((MainActivity) getActivity()).setCartCount();
                                     }
                                 }
-
                                 @Override
                                 public void onError(String error) {
 
@@ -333,25 +347,29 @@ public class CartFragment extends Fragment {
                 }
             });
         }
+
         @Override
         public void onBindViewHolder(final CartGoodsViewHolder holder, int position) {
-            CartBean bean = list.get(position);
+            CartBean bean = adapter.list.get(position);
             if (bean.isChecked()) {
                 holder.mCartCheck.setImageResource(R.mipmap.checkbox_pressed);
             } else {
                 holder.mCartCheck.setImageResource(R.mipmap.checkbox_normal);
             }
+            if(bean.getGoods()!=null){
+                holder.mCartPrivice.setText(bean.getGoods().getCurrencyPrice());
+                holder.mCartGoodsName.setText(bean.getGoods().getGoodsName());
+                Picasso.with(context).load(I.SERVER_ROOT + I.REQUEST_DOWNLOAD_IMAGE + "?" + I.Boutique.IMAGE_URL +
+                        "=" + bean.getGoods().getGoodsImg())
+                        .placeholder(R.drawable.nopic)
+                        .error(R.drawable.nopic)
+                        .into(holder.mCartIv);
+            }
+            holder.mCartGoodsCount.setText("(" + bean.getCount() + ")");
             holder.mCartCheck.setTag(position);
             holder.mCartAdd.setTag(position);
             holder.mCartCut.setTag(position);
-            holder.mCartGoodsCount.setText("(" + bean.getCount() + ")");
-            holder.mCartGoodsName.setText(bean.getGoods().getGoodsName());
-            Picasso.with(context).load(I.SERVER_ROOT + I.REQUEST_DOWNLOAD_IMAGE + "?" + I.Boutique.IMAGE_URL +
-                    "=" + bean.getGoods().getGoodsImg())
-                    .placeholder(R.drawable.nopic)
-                    .error(R.drawable.nopic)
-                    .into(holder.mCartIv);
-            holder.mCartPrivice.setText(bean.getGoods().getCurrencyPrice());
+
         }
 
         public void addAllPrivice() {
@@ -366,13 +384,12 @@ public class CartFragment extends Fragment {
             mCartTotal.setText("合计：" + mTotalPrivice);
             mCartSave.setText("节省：" + mSave);
         }
+
         @Override
         public int getItemCount() {
             return list == null ? 0 : list.size();
         }
     }
-
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();

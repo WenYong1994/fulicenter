@@ -103,6 +103,12 @@ public class MainActivity extends AppCompatActivity {
                 mLastCheckNoPersion= (RadioButton) v;
                 break;
             case R.id.rb_id_cars:
+                if(FuLiCenterApplication.getInstance().getUserAvatar()==null){
+                    CommonUtils.showShortToast("请先登录");
+                    Intent intent = new Intent(this,LoginActivity.class);
+                    MFGT.startActivity(this,intent);
+                    return;
+                }
                 mutual((RadioButton) v);
                 CartFragment fragmentCart =new CartFragment();
                 FragmentTransaction ftCart = getSupportFragmentManager().beginTransaction();
