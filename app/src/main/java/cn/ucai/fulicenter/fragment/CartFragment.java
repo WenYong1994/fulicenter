@@ -2,6 +2,7 @@ package cn.ucai.fulicenter.fragment;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -25,6 +26,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.ucai.fulicenter.R;
+import cn.ucai.fulicenter.activity.GoodsDetailsActivity;
+import cn.ucai.fulicenter.activity.IndentActivity;
 import cn.ucai.fulicenter.activity.MainActivity;
 import cn.ucai.fulicenter.application.FuLiCenterApplication;
 import cn.ucai.fulicenter.bean.CartBean;
@@ -34,6 +37,7 @@ import cn.ucai.fulicenter.bean.UserAvatar;
 import cn.ucai.fulicenter.utils.CommonUtils;
 import cn.ucai.fulicenter.utils.I;
 import cn.ucai.fulicenter.utils.L;
+import cn.ucai.fulicenter.utils.MFGT;
 import cn.ucai.fulicenter.utils.OkHttpUtils;
 
 /**
@@ -71,6 +75,9 @@ public class CartFragment extends Fragment {
         // Required empty public constructor
     }
 
+
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -79,10 +86,10 @@ public class CartFragment extends Fragment {
         ButterKnife.bind(this, view);
         userAvatar = FuLiCenterApplication.getInstance().getUserAvatar();
         initView();
-        initData(PULL_UP_OR_INIT, page_id);
         setListener();
         return view;
     }
+
 
     private void setListener() {
         mCartSwi.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -122,7 +129,6 @@ public class CartFragment extends Fragment {
                         if (result != null) {
                             switch (action) {
                                 case PULL_UP_OR_INIT:
-                                    mCartSwi.setRefreshing(false);
                                     mCartHint.setVisibility(View.GONE);
                                     ArrayList<CartBean> list = utils.array2List(result);
                                     for (CartBean bean : list) {
@@ -160,7 +166,22 @@ public class CartFragment extends Fragment {
 
     @OnClick(R.id.m_Cart_Pay)
     public void onClick() {
-        CommonUtils.showShortToast("点我支付");
+        ArrayList<Integer> listCartBean = new ArrayList<>();
+        for(CartBean bean : adapter.list){
+            if(bean.isChecked()){
+                listCartBean.add(bean.getGoodsId());
+            }
+        }
+        if(listCartBean.size()>0){
+
+            Intent intent = new Intent((MainActivity)getContext(), IndentActivity.class);
+            int privice = privice2Int(mCartTotal.getText().toString());
+            intent.putExtra("cartList",listCartBean);
+            intent.putExtra("tatolPrivice",privice);
+            MFGT.startActivity((MainActivity)getContext(),intent);
+        }else {
+            CommonUtils.showLongToast("请选中商品");
+        }
     }
 
 
@@ -229,6 +250,7 @@ public class CartFragment extends Fragment {
             this.list.clear();
             this.list.addAll(list);
             notifyDataSetChanged();
+            mCartSwi.setRefreshing(false);
         }
 
         public GoodsAdapter(ArrayList<CartBean> list, Context context) {
@@ -243,6 +265,14 @@ public class CartFragment extends Fragment {
             setHolderMCartAdd(holder);
             setmCartCheckListener(holder);
             setCartCut(holder);
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent((MainActivity)getContext(), GoodsDetailsActivity.class);
+                    intent.putExtra("id",adapter.list.get(holder.getPosition()).getGoodsId());
+                    MFGT.startActivity((MainActivity)getContext(),intent);
+                }
+            });
             return holder;
         }
 
@@ -317,7 +347,6 @@ public class CartFragment extends Fragment {
                 }
             });
         }
-
         private void setHolderMCartAdd(final CartGoodsViewHolder holder) {
             holder.mCartAdd.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -390,6 +419,14 @@ public class CartFragment extends Fragment {
             return list == null ? 0 : list.size();
         }
     }
+
+    @Override
+    public void onResume() {
+        initData(PULL_UP_OR_INIT, page_id);
+        super.onResume();
+    }
+
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();

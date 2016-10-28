@@ -61,7 +61,8 @@
         <activity android:name=".activity.RegisterActivity" />
         <activity android:name=".activity.CollectActivity" />
         <activity android:name=".activity.UpdataPersionActivity" />
-        <activity android:name=".activity.UpdataNickActivity"></activity>
+        <activity android:name=".activity.UpdataNickActivity" />
+        <activity android:name=".activity.IndentActivity"></activity>
     </application>
 
 </manifest>
