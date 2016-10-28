@@ -169,7 +169,7 @@ public class CartFragment extends Fragment {
         ArrayList<Integer> listCartBean = new ArrayList<>();
         for(CartBean bean : adapter.list){
             if(bean.isChecked()){
-                listCartBean.add(bean.getGoodsId());
+                listCartBean.add(bean.getId());
             }
         }
         if(listCartBean.size()>0){
