@@ -115,7 +115,7 @@ public class BoutiqueFragment extends BaseFragment {
                         if(result!=null||result.length!=0){
                             ArrayList list1=(myutils.array2List(result));
                             mAdpter.initOrRefreshList(list1);
-                            swipeRefreshBoutiqueFirst.setRefreshing(false);
+
                             tvHintBoutiqueFirst.setVisibility(View.GONE);
                         }else {
                             L.i("result"+ Arrays.toString(result));
@@ -238,6 +238,7 @@ public class BoutiqueFragment extends BaseFragment {
             this.list.clear();
             this.list.addAll(list1);
             notifyDataSetChanged();
+            swipeRefreshBoutiqueFirst.setRefreshing(false);
         }
 
         public void addList(ArrayList<BouiqueBean> list1){

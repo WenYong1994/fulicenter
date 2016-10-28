@@ -120,7 +120,7 @@ public class CollectActivity extends AppCompatActivity {
                             switch (actiong) {
                                 case PULL_DOWN_OR_INIT:
                                     adapter.updataList(list);
-                                    mCollectSwi.setRefreshing(false);
+
                                     mCollectHint.setVisibility(View.GONE);
                                     break;
                                 case PULL_UP:
@@ -210,6 +210,7 @@ public class CollectActivity extends AppCompatActivity {
             this.list.clear();
             this.list.addAll(list);
             notifyDataSetChanged();
+            mCollectSwi.setRefreshing(false);
         }
 
         public void addList(ArrayList<CollectBean> list) {

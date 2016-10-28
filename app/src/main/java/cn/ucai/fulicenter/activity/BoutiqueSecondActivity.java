@@ -157,7 +157,7 @@ public class BoutiqueSecondActivity extends AppCompatActivity {
                                     mGoodsAdapter.initOrRefreshList(list);
                                     break;
                                 case PULL_DOWN_ACTION:
-                                    mSwi.setRefreshing(false);
+
                                     tvHint.setVisibility(View.GONE);
                                     mGoodsAdapter.setMore(true);
                                     mGoodsAdapter.initOrRefreshList(list);
@@ -312,6 +312,7 @@ public class BoutiqueSecondActivity extends AppCompatActivity {
             newGoodsBeenList.clear();
             this.newGoodsBeenList.addAll(list);
             notifyDataSetChanged();
+            mSwi.setRefreshing(false);
         }
 
         public void addList(ArrayList<NewGoodsBean> list){
