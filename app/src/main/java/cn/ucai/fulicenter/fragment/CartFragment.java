@@ -48,7 +48,7 @@ public class CartFragment extends Fragment {
     final int PULL_UP_OR_INIT = 1;
     final int PULL_DOWN = 2;
     int page_id = 1;
-    final int PAGE_SIZE = 10;
+    final int PAGE_SIZE = 1000;
 
     boolean isCatNull;
     GoodsAdapter adapter;

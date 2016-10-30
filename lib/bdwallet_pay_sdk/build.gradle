@@ -24,6 +24,8 @@ android {
             jniLibs.srcDirs = ['libs']
         }
     }
+
+
 }
 
 dependencies {

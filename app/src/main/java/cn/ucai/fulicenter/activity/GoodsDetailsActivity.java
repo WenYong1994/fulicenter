@@ -230,7 +230,28 @@ public static final String TAG = GoodsDetailsActivity.class.getSimpleName();
                                         CommonUtils.showShortToast("已添加商品到购物车中");
                                         cartCount=1;
                                         mGoodDetailTitlCarsHint.setText(""+cartCount);
-                                        carId=Integer.parseInt(result.getMsg());
+                                        final OkHttpUtils<CartBean[]> utils = new OkHttpUtils<CartBean[]>(GoodsDetailsActivity.this);
+                                        utils.url(I.SERVER_ROOT + I.REQUEST_FIND_CARTS)
+                                                .targetClass(CartBean[].class)
+                                                .addParam(I.Cart.USER_NAME, user.getMuserName())
+                                                .addParam(I.PAGE_ID, 1+"")
+                                                .addParam(I.PAGE_SIZE, 1000 + "")
+                                                .execute(new OkHttpUtils.OnCompleteListener<CartBean[]>() {
+                                                    @Override
+                                                    public void onSuccess(CartBean[] result) {
+                                                        for(CartBean bean : result){
+                                                            if(bean.getGoodsId()==id){
+                                                                carId=bean.getId();
+                                                                return;
+                                                            }
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onError(String error) {
+
+                                                    }
+                                                });
                                     }
                                 }
 
