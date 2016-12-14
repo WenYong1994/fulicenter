@@ -155,6 +155,8 @@ public class RegisterActivity extends AppCompatActivity {
             mRegisterOkPassWrod.requestFocus();
             return false;
         }
+
+
         return true;
     }
 

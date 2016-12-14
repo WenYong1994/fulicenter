@@ -11,20 +11,17 @@
         >
         <!-- TODO: Update blank fragment layout -->
         <LinearLayout
-            android:background="#c1bfbf"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <LinearLayout
                 android:layout_weight="40"
                 android:gravity="center_horizontal"
-                android:background="#c1bfbf"
                 android:orientation="vertical"
                 android:layout_width="280dp"
                 android:layout_height="match_parent">
                 <TextView
                     android:layout_gravity="center_horizontal"
-                    android:background="#c1bfbf"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="加载中……"
